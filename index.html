@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controller Detect</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #181b22; --line: #2a2f3a; --text: #e6e8ee; --muted: #8b93a5;
+    --accent: #4fd1a5; --warn: #f6c453; --bad: #f2727f; --l: #5aa9ff; --r: #ff8a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 0 0 8px; }
+  p.sub { color: var(--muted); margin: 0 0 16px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+  button { background: #252a35; color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font: inherit; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #062018; border-color: var(--accent); font-weight: 600; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .muted { color: var(--muted); }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+  #pads { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+  .pad { border: 1px solid var(--line); border-radius: 8px; padding: 10px; transition: border-color .1s, box-shadow .1s; }
+  .pad.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,209,165,.25); }
+  .pad .title { font-weight: 600; word-break: break-all; }
+  .pad table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  .pad td { padding: 2px 0; vertical-align: top; }
+  .pad td:first-child { color: var(--muted); width: 95px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 8px; }
+  .btns span { min-width: 26px; text-align: center; padding: 2px 4px; border-radius: 4px; background: #232733; font-size: 11px; }
+  .btns span.on { background: var(--accent); color: #062018; }
+  .axes { margin-top: 6px; display: grid; gap: 3px; }
+  .axis { display: grid; grid-template-columns: 30px 1fr 50px; gap: 6px; align-items: center; font-size: 11px; }
+  .bar { height: 8px; background: #232733; border-radius: 4px; position: relative; overflow: hidden; }
+  .bar i { position: absolute; top: 0; bottom: 0; background: var(--l); }
+  .bar::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--muted); }
+  #log { height: 320px; overflow: auto; background: #0b0d11; border: 1px solid var(--line); border-radius: 8px; padding: 8px; white-space: pre-wrap; word-break: break-all; }
+  #log .ev-connect { color: var(--accent); }
+  #log .ev-disconnect { color: var(--bad); }
+  #log .ev-info { color: var(--warn); }
+  .tag { display: inline-block; padding: 0 6px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .tag.L { background: var(--l); color: #04162b; }
+  .tag.R { background: var(--r); color: #2b0d04; }
+  #wizard .step { font-size: 16px; padding: 10px; border-radius: 8px; background: #11141a; border: 1px dashed var(--line); margin: 8px 0; }
+  #verdict { padding: 10px; border-radius: 8px; margin-top: 8px; display: none; }
+  #verdict.good { display: block; background: rgba(79,209,165,.12); border: 1px solid var(--accent); }
+  #verdict.bad { display: block; background: rgba(242,114,127,.12); border: 1px solid var(--bad); }
+  #verdict.meh { display: block; background: rgba(246,196,83,.12); border: 1px solid var(--warn); }
+  label { display: inline-flex; gap: 6px; align-items: center; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Controller Detect</h1>
+  <p class="sub">Logs what the browser Gamepad API reports for each connected controller: index, id string, vendor and product IDs, mapping, buttons and axes. Use it to check whether split mode on the Infinix GT NX shows up as one gamepad or two.</p>
+
+  <section id="status">
+    <div class="row">
+      <strong id="support"></strong>
+      <span class="muted" id="count">0 gamepads</span>
+    </div>
+    <p class="muted" style="margin:8px 0 0">No gamepad shows up until you <b>press a button</b> on it while this page is open. Browsers hide controllers until then.</p>
+  </section>
+
+  <section id="wizard">
+    <h2>Split-mode test</h2>
+    <p class="muted" style="margin:0">Put the controller in split mode, then run this. It records which gamepad (index + id) each half reports as.</p>
+    <div class="step" id="wizStep">Press <b>Start</b> to begin.</div>
+    <div class="row">
+      <button class="primary" id="wizStart">Start</button>
+      <button id="wizReset">Reset</button>
+    </div>
+    <div id="verdict"></div>
+  </section>
+
+  <section>
+    <h2>Connected gamepads</h2>
+    <div id="pads"><p class="muted">Nothing yet. Press a button on the controller.</p></div>
+  </section>
+
+  <section>
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h2 style="margin:0">Event log</h2>
+      <div class="row">
+        <label><input type="checkbox" id="logAxes"> log stick movement</label>
+        <button id="copyLog">Copy</button>
+        <button id="saveLog">Download .txt</button>
+        <button id="dumpBtn">Dump full state</button>
+        <button id="clearLog">Clear</button>
+      </div>
+    </div>
+    <div id="log" class="mono"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const logEl = $('log');
+  const lines = [];
+  const AXIS_THRESHOLD = 0.5;
+
+  // Per-index state: previous button/axis values, plus the id we first saw there.
+  const prev = new Map();
+  let lastActiveIndex = null;
+  let activeTimer = null;
+
+  const ts = () => {
+    const d = new Date();
+    return d.toTimeString().slice(0, 8) + '.' + String(d.getMilliseconds()).padStart(3, '0');
+  };
+
+  function log(msg, cls = '') {
+    const line = `[${ts()}] ${msg}`;
+    lines.push(line);
+    const div = document.createElement('div');
+    if (cls) div.className = cls;
+    div.textContent = line;
+    logEl.appendChild(div);
+    if (logEl.childElementCount > 2000) logEl.firstChild.remove();
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // Chrome: "Name (STANDARD GAMEPAD Vendor: 045e Product: 028e)"
+  // Firefox: "045e-028e-Name"
+  function parseIds(id) {
+    let m = id.match(/Vendor:\s*([0-9a-f]{4}).*Product:\s*([0-9a-f]{4})/i);
+    if (m) return { vendor: m[1].toLowerCase(), product: m[2].toLowerCase() };
+    m = id.match(/^([0-9a-f]{1,4})-([0-9a-f]{1,4})-/i);
+    if (m) return { vendor: m[1].padStart(4, '0').toLowerCase(), product: m[2].padStart(4, '0').toLowerCase() };
+    return { vendor: null, product: null };
+  }
+
+  function describe(gp) {
+    const { vendor, product } = parseIds(gp.id);
+    return {
+      index: gp.index,
+      id: gp.id,
+      vendor: vendor ?? '(not in id string)',
+      product: product ?? '(not in id string)',
+      mapping: gp.mapping || '(empty: non-standard layout)',
+      buttons: gp.buttons.length,
+      axes: gp.axes.length,
+      connected: gp.connected,
+      timestamp: Math.round(gp.timestamp),
+      vibration: gp.vibrationActuator ? (gp.vibrationActuator.type || 'yes') : 'none',
+      hand: gp.hand || '',
+      touches: gp.touches ? gp.touches.length : undefined,
+    };
+  }
+
+  function describeLine(gp) {
+    const d = describe(gp);
+    return `index=${d.index} id="${d.id}" vendor=${d.vendor} product=${d.product} mapping=${d.mapping} buttons=${d.buttons} axes=${d.axes}` +
+      (d.hand ? ` hand=${d.hand}` : '') + ` vibration=${d.vibration}`;
+  }
+
+  const pads = () => Array.from(navigator.getGamepads ? navigator.getGamepads() : []).filter(Boolean);
+
+  // ---------- connect / disconnect ----------
+  window.addEventListener('gamepadconnected', (e) => {
+    log(`CONNECTED   ${describeLine(e.gamepad)}`, 'ev-connect');
+    prev.set(e.gamepad.index, snapshot(e.gamepad));
+    renderPads(true);
+  });
+  window.addEventListener('gamepaddisconnected', (e) => {
+    log(`DISCONNECTED index=${e.gamepad.index} id="${e.gamepad.id}"`, 'ev-disconnect');
+    prev.delete(e.gamepad.index);
+    renderPads(true);
+  });
+
+  function snapshot(gp) {
+    return { b: gp.buttons.map((x) => x.pressed), a: gp.axes.map((v) => v), id: gp.id };
+  }
+
+  // ---------- render ----------
+  function renderPads(rebuild) {
+    const list = pads();
+    $('count').textContent = `${list.length} gamepad${list.length === 1 ? '' : 's'}`;
+    const host = $('pads');
+    if (rebuild || host.dataset.sig !== list.map((g) => g.index + g.id).join('|')) {
+      host.dataset.sig = list.map((g) => g.index + g.id).join('|');
+      if (!list.length) { host.innerHTML = '<p class="muted">Nothing yet. Press a button on the controller.</p>'; return; }
+      host.innerHTML = '';
+      for (const gp of list) {
+        const d = describe(gp);
+        const el = document.createElement('div');
+        el.className = 'pad';
+        el.id = 'pad-' + gp.index;
+        el.innerHTML = `
+          <div class="title">#${d.index} · <span class="mono"></span></div>
+          <table class="mono">
+            <tr><td>index</td><td>${d.index}</td></tr>
+            <tr><td>vendor</td><td>${d.vendor}</td></tr>
+            <tr><td>product</td><td>${d.product}</td></tr>
+            <tr><td>mapping</td><td>${d.mapping}</td></tr>
+            <tr><td>buttons/axes</td><td>${d.buttons} / ${d.axes}</td></tr>
+            <tr><td>vibration</td><td>${d.vibration}</td></tr>
+            ${d.hand ? `<tr><td>hand</td><td>${d.hand}</td></tr>` : ''}
+            <tr><td>timestamp</td><td class="tsv">${d.timestamp}</td></tr>
+          </table>
+          <div class="btns">${gp.buttons.map((_, i) => `<span data-b="${i}">${i}</span>`).join('')}</div>
+          <div class="axes">${gp.axes.map((_, i) => `<div class="axis"><span>a${i}</span><div class="bar"><i data-a="${i}"></i></div><span class="av" data-av="${i}">0.00</span></div>`).join('')}</div>
+          <div class="row" style="margin-top:8px"><button data-rumble="${gp.index}">Rumble</button></div>`;
+        el.querySelector('.title .mono').textContent = d.id;
+        host.appendChild(el);
+      }
+    }
+    for (const gp of list) {
+      const el = $('pad-' + gp.index);
+      if (!el) continue;
+      el.querySelector('.tsv').textContent = Math.round(gp.timestamp);
+      gp.buttons.forEach((b, i) => el.querySelector(`[data-b="${i}"]`)?.classList.toggle('on', b.pressed));
+      gp.axes.forEach((v, i) => {
+        const bar = el.querySelector(`[data-a="${i}"]`);
+        if (bar) {
+          const pct = Math.abs(v) * 50;
+          bar.style.left = v < 0 ? (50 - pct) + '%' : '50%';
+          bar.style.width = pct + '%';
+        }
+        const t = el.querySelector(`[data-av="${i}"]`);
+        if (t) t.textContent = v.toFixed(2);
+      });
+    }
+  }
+
+  function flash(index) {
+    document.querySelectorAll('.pad.active').forEach((n) => n.classList.remove('active'));
+    $('pad-' + index)?.classList.add('active');
+    clearTimeout(activeTimer);
+    activeTimer = setTimeout(() => $('pad-' + index)?.classList.remove('active'), 400);
+  }
+
+  $('pads').addEventListener('click', (e) => {
+    const idx = e.target.dataset?.rumble;
+    if (idx === undefined) return;
+    const gp = navigator.getGamepads()[+idx];
+    const va = gp?.vibrationActuator;
+    if (!va) { log(`index=${idx}: no vibrationActuator`, 'ev-info'); return; }
+    va.playEffect(va.type || 'dual-rumble', { duration: 300, strongMagnitude: 1, weakMagnitude: 1 })
+      .then((r) => log(`index=${idx}: rumble ${r}`, 'ev-info'))
+      .catch((err) => log(`index=${idx}: rumble failed ${err}`, 'ev-info'));
+  });
+
+  // ---------- polling loop ----------
+  function tick() {
+    for (const gp of pads()) {
+      let p = prev.get(gp.index);
+      if (!p) {
+        // Some browsers (and some controllers) never fire gamepadconnected; catch them here.
+        log(`SEEN (poll)  ${describeLine(gp)}`, 'ev-connect');
+        p = snapshot(gp);
+        prev.set(gp.index, p);
+      }
+      if (p.id !== gp.id) {
+        log(`ID CHANGED at index=${gp.index}: "${p.id}" -> "${gp.id}"`, 'ev-info');
+        p.id = gp.id;
+      }
+      gp.buttons.forEach((b, i) => {
+        if (b.pressed !== p.b[i]) {
+          p.b[i] = b.pressed;
+          if (b.pressed) {
+            log(`index=${gp.index} button ${i} DOWN (value ${b.value.toFixed(2)})  id="${gp.id}"`);
+            flash(gp.index);
+            wizardInput(gp, `button ${i}`);
+          } else {
+            log(`index=${gp.index} button ${i} up`);
+          }
+        }
+      });
+      gp.axes.forEach((v, i) => {
+        const was = p.a[i] ?? 0;
+        const crossed = (Math.abs(v) >= AXIS_THRESHOLD) !== (Math.abs(was) >= AXIS_THRESHOLD);
+        if ($('logAxes').checked ? Math.abs(v - was) > 0.15 : crossed) {
+          p.a[i] = v;
+          log(`index=${gp.index} axis ${i} = ${v.toFixed(2)}  id="${gp.id}"`);
+          if (Math.abs(v) >= AXIS_THRESHOLD) { flash(gp.index); wizardInput(gp, `axis ${i}`); }
+        }
+      });
+    }
+    renderPads(false);
+    requestAnimationFrame(tick);
+  }
+
+  // ---------- split-mode wizard ----------
+  const wiz = { step: 0, left: null, right: null, armedAt: 0 };
+  const WIZ_TEXT = [
+    'Press <b>Start</b> to begin.',
+    'Press any button or move the stick on the <span class="tag L">LEFT</span> half only.',
+    'Now press any button or move the stick on the <span class="tag R">RIGHT</span> half only.',
+    'Done. See the result below. Press Reset to run it again.',
+  ];
+  function setStep(n) { wiz.step = n; wiz.armedAt = performance.now(); $('wizStep').innerHTML = WIZ_TEXT[n]; }
+
+  function wizardInput(gp, what) {
+    if (performance.now() - wiz.armedAt < 400) return; // ignore leftover input from the previous step
+    const rec = { index: gp.index, id: gp.id, what, ...parseIds(gp.id), buttons: gp.buttons.length, axes: gp.axes.length };
+    if (wiz.step === 1) {
+      wiz.left = rec;
+      log(`WIZARD left half -> index=${rec.index} (${what}) id="${rec.id}"`, 'ev-info');
+      setStep(2);
+    } else if (wiz.step === 2) {
+      wiz.right = rec;
+      log(`WIZARD right half -> index=${rec.index} (${what}) id="${rec.id}"`, 'ev-info');
+      setStep(3);
+      verdict();
+    }
+  }
+
+  function verdict() {
+    const { left: L, right: R } = wiz;
+    const v = $('verdict');
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const detail = `<div class="mono" style="margin-top:6px">
+      <span class="tag L">L</span> index=${L.index} vendor=${L.vendor ?? '?'} product=${L.product ?? '?'} buttons=${L.buttons} axes=${L.axes}<br>&nbsp;&nbsp;&nbsp;id="${esc(L.id)}"<br>
+      <span class="tag R">R</span> index=${R.index} vendor=${R.vendor ?? '?'} product=${R.product ?? '?'} buttons=${R.buttons} axes=${R.axes}<br>&nbsp;&nbsp;&nbsp;id="${esc(R.id)}"</div>`;
+    let msg, cls;
+    if (L.index === R.index) {
+      cls = 'bad';
+      msg = '<b>Same gamepad.</b> Both halves report as one device (same index). In this mode the browser sees a single controller, so you cannot tell the halves apart by ID. Try a different controller mode (the GT NX has several) and run the test again.';
+    } else if (L.id !== R.id) {
+      cls = 'good';
+      msg = '<b>Two different devices with different id strings.</b> Each half has its own ID, so you can bind each one separately by its id.';
+    } else {
+      cls = 'meh';
+      msg = '<b>Two devices, same id string.</b> The halves show up as separate gamepads (different index) but report identical IDs. You can tell them apart by connection order (index) only, which can change after a reconnect.';
+    }
+    v.className = cls;
+    v.innerHTML = msg + detail;
+    log(`WIZARD verdict: ${cls === 'good' ? 'DIFFERENT IDS' : cls === 'meh' ? 'SEPARATE DEVICES, SAME ID' : 'SAME DEVICE'}`, 'ev-info');
+  }
+
+  $('wizStart').onclick = () => { wiz.left = wiz.right = null; $('verdict').className = ''; $('verdict').innerHTML = ''; setStep(1); log('WIZARD started', 'ev-info'); };
+  $('wizReset').onclick = () => { wiz.left = wiz.right = null; $('verdict').className = ''; $('verdict').innerHTML = ''; setStep(0); };
+
+  // ---------- log tools ----------
+  const env = () => `UA: ${navigator.userAgent}\nPage: ${location.href}\nTime: ${new Date().toISOString()}`;
+  $('dumpBtn').onclick = () => {
+    const list = pads();
+    log(`DUMP: ${list.length} gamepad(s)`, 'ev-info');
+    for (const gp of list) log('  ' + JSON.stringify(describe(gp)), 'ev-info');
+  };
+  $('clearLog').onclick = () => { lines.length = 0; logEl.innerHTML = ''; };
+  $('copyLog').onclick = async () => {
+    const text = env() + '\n\n' + lines.join('\n');
+    try { await navigator.clipboard.writeText(text); log('Log copied to clipboard', 'ev-info'); }
+    catch { log('Clipboard blocked; use Download instead', 'ev-info'); }
+  };
+  $('saveLog').onclick = () => {
+    const blob = new Blob([env() + '\n\n' + lines.join('\n')], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `controller-log-${Date.now()}.txt`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  // ---------- start ----------
+  if (!('getGamepads' in navigator)) {
+    $('support').textContent = 'This browser has no Gamepad API.';
+    $('support').style.color = 'var(--bad)';
+  } else if (!window.isSecureContext) {
+    $('support').textContent = 'Not a secure context: open this page over https:// or localhost, or the Gamepad API may be blocked.';
+    $('support').style.color = 'var(--warn)';
+  } else {
+    $('support').textContent = 'Gamepad API available.';
+    $('support').style.color = 'var(--accent)';
+  }
+  log(env().replace(/\n/g, ' | '), 'ev-info');
+  setStep(0);
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
