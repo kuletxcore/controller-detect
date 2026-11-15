@@ -50,6 +50,22 @@
   #verdict.bad { display: block; background: rgba(242,114,127,.12); border: 1px solid var(--bad); }
   #verdict.meh { display: block; background: rgba(246,196,83,.12); border: 1px solid var(--warn); }
   label { display: inline-flex; gap: 6px; align-items: center; }
+  .jc-halves { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 10px; }
+  .jc { border: 1px solid var(--line); border-radius: 18px; padding: 10px; }
+  .jc.L { border-top: 4px solid var(--l); }
+  .jc.R { border-top: 4px solid var(--r); }
+  .jc.off { opacity: .45; }
+  .jc h3 { margin: 0 0 2px; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+  .jc .conn { font-weight: 400; font-size: 12px; color: var(--muted); }
+  .jc .grp { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; margin: 8px 0 4px; }
+  .jc .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { border: 1px solid var(--line); background: #1f232d; border-radius: 8px; padding: 4px 8px; min-width: 64px; text-align: center; transition: background .05s; }
+  .chip b { display: block; font-size: 14px; }
+  .chip small { display: block; font-size: 10.5px; color: var(--muted); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #062018; }
+  .chip.on small { color: #0c3a2c; }
+  .chip.verify { border-style: dashed; border-color: var(--warn); }
+  .jc .extra { margin-top: 8px; font-size: 12px; min-height: 1.4em; }
   #labPrompt .big { font-size: 22px; font-weight: 700; display: block; margin: 4px 0; }
   #labPrompt .hint { color: var(--muted); font-size: 13px; }
   #labTable { border-collapse: collapse; width: 100%; }
@@ -81,6 +97,13 @@
       <button id="wizReset">Reset</button>
     </div>
     <div id="verdict"></div>
+  </section>
+
+  <section id="joycon">
+    <h2>Joy-Con view (GT NX split mode)</h2>
+    <p class="muted" style="margin:0">Shows each half as a Joy-Con using the measured profile (<a href="gtnx-split-profile.json" style="color:var(--accent)">gtnx-split-profile.json</a>). Press a physical control. The chip that lights should be the control you pressed. If a different one lights, that row of the profile is wrong. Big text is the label printed on the hardware; small text is the Switch role.</p>
+    <div id="jcStatus" class="muted" style="margin-top:8px">Loading profile…</div>
+    <div id="jcHalves" class="jc-halves"></div>
   </section>
 
   <section id="labeler">
@@ -313,6 +336,7 @@
       });
     }
     labTick(pads());
+    jcTick(pads());
     renderPads(false);
     requestAnimationFrame(tick);
   }
@@ -367,6 +391,73 @@
 
   $('wizStart').onclick = () => { wiz.left = wiz.right = null; $('verdict').className = ''; $('verdict').innerHTML = ''; setStep(1); log('WIZARD started', 'ev-info'); };
   $('wizReset').onclick = () => { wiz.left = wiz.right = null; $('verdict').className = ''; $('verdict').innerHTML = ''; setStep(0); };
+
+  // ---------- Joy-Con view ----------
+  const JC_GROUPS = {
+    L: [['Stick (digital)', ['stick_up', 'stick_down', 'stick_left', 'stick_right', 'stick_click']],
+        ['D-pad', ['dpad_up', 'dpad_down', 'dpad_left', 'dpad_right']],
+        ['Shoulders', ['lb', 'lt']], ['System', ['view', 'bluetooth']], ['Rail', ['rail_near', 'rail_far']]],
+    R: [['Face buttons (printed)', ['face_a', 'face_b', 'face_x', 'face_y']],
+        ['Shoulders', ['rb', 'rt']], ['System', ['menu', 'screenshot']], ['Rail', ['rail_near', 'rail_far']]],
+  };
+  const jc = { profile: null, re: null };
+
+  async function jcLoad() {
+    try {
+      const res = await fetch('gtnx-split-profile.json', { cache: 'no-cache' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      jc.profile = await res.json();
+    } catch (err) {
+      $('jcStatus').textContent = `Could not load the profile (${err.message}). Open the page from the live site.`;
+      return;
+    }
+    const m = jc.profile.device.match;
+    jc.re = { L: new RegExp(m.left), R: new RegExp(m.right) };
+    $('jcStatus').textContent = `Profile v${jc.profile.version}, measured ${jc.profile.measured.date}. Dashed chips are not verified yet.`;
+    const host = $('jcHalves');
+    for (const side of ['L', 'R']) {
+      const half = jc.profile.halves[side];
+      const byId = Object.fromEntries(half.controls.map((c) => [c.id, c]));
+      const card = document.createElement('div');
+      card.className = `jc ${side} off`;
+      card.id = 'jc-' + side;
+      card.innerHTML = `<h3><span>${side === 'L' ? 'Left' : 'Right'} Joy-Con · <span class="mono">-${side}</span></span><span class="conn">not connected</span></h3>` +
+        JC_GROUPS[side].map(([title, ids]) => `<div class="grp">${title}</div><div class="chips">${ids.map((id) => {
+          const c = byId[id];
+          if (!c) return '';
+          const tip = [c.upright, `index ${c.index}`, c.verify || c.warning || c.note || ''].filter(Boolean).join(' · ');
+          return `<div class="chip${c.verify ? ' verify' : ''}" data-ctl="${id}" title="${tip.replace(/"/g, '&quot;')}"><b>${c.glyph}</b><small>${c.switchDual}</small></div>`;
+        }).join('')}</div>`).join('') +
+        `<div class="extra mono muted"></div>`;
+      host.appendChild(card);
+    }
+  }
+
+  function jcTick(list) {
+    if (!jc.profile) return;
+    for (const side of ['L', 'R']) {
+      const card = $('jc-' + side);
+      if (!card) continue;
+      const gp = list.find((g) => jc.re[side].test(g.id));
+      card.classList.toggle('off', !gp);
+      card.querySelector('.conn').textContent = gp ? `connected · slot ${gp.index}` : 'not connected';
+      const half = jc.profile.halves[side];
+      const pressed = new Set();
+      if (gp) gp.buttons.forEach((b, i) => { if (b.pressed || b.value > 0.5) pressed.add(i); });
+      for (const c of half.controls) {
+        card.querySelector(`[data-ctl="${c.id}"]`)?.classList.toggle('on', pressed.has(c.index));
+      }
+      const known = new Set(half.controls.map((c) => c.index));
+      const ignored = new Set((half.ignore || []).flatMap((x) => x.indexes));
+      const other = [...pressed].filter((i) => !known.has(i));
+      const extra = card.querySelector('.extra');
+      extra.textContent = other.length
+        ? other.map((i) => ignored.has(i) ? `button ${i} (touchpad noise, ignored)` : `button ${i} (not in profile)`).join(', ')
+        : '';
+      const axes = gp ? gp.axes.map((v, i) => [i, v]).filter(([, v]) => Math.abs(v) > 0.3) : [];
+      if (axes.length) extra.textContent += (extra.textContent ? ' · ' : '') + axes.map(([i, v]) => `axis ${i} = ${v.toFixed(2)} (analog! profile says none)`).join(', ');
+    }
+  }
 
   // ---------- button labeling ----------
   const RAIL = 'Tap it quickly: one of the rail buttons may be Power, and holding it 3 s turns that half off.';
@@ -602,6 +693,7 @@
   }
   log(env().replace(/\n/g, ' | '), 'ev-info');
   setStep(0);
+  jcLoad();
   requestAnimationFrame(tick);
 })();
 </script>
