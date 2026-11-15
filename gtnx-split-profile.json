@@ -1,0 +1,73 @@
+{
+  "profile": "infinix-gt-nx-split",
+  "version": 1,
+  "measured": {
+    "date": "2026-11-15",
+    "platform": "Android 10, Chrome 157, Web Gamepad API (mapping: standard)",
+    "units": 1,
+    "tool": "https://controller.kuletxcore.workers.dev (Button labeling)"
+  },
+  "device": {
+    "model": "Infinix GT NX Controller (XGC001)",
+    "vendorId": "045e",
+    "productId": "0b13",
+    "vendorNote": "Spoofed Microsoft Xbox Wireless Controller IDs. Identical for both halves and for combined mode. Never identify the GT NX by VID/PID alone.",
+    "buttons": 18,
+    "axes": 4,
+    "vibration": "dual-rumble, per half",
+    "match": {
+      "left": "GT NX Controller-L|Infinix Controller-L",
+      "right": "GT NX Controller-R|Infinix Controller-R",
+      "combined": "GT NX Controller(?!-)|Infinix Controller(?![-])",
+      "mappingMode": "GT NX Controller-T|Infinix Controller-T",
+      "note": "Regexes against the gamepad id / Android InputDevice name. Combined mode uses the normal Xbox profile; only -L and -R use this profile."
+    }
+  },
+  "orientation": {
+    "upright": "Half held as if attached to the phone: bumpers/triggers on top.",
+    "sideways": "Half turned 90 degrees with the rail (inner edge) facing up, like a sideways Joy-Con. Left half: stick ends up on the left. Right half: buttons end up on the left.",
+    "note": "Stick directions are reported in the sideways frame (e.g. pushing the left stick toward the bumpers reports D-pad Left)."
+  },
+  "halves": {
+    "L": {
+      "joycon": "left",
+      "analogAxes": false,
+      "controls": [
+        { "id": "stick_up",    "index": 14, "type": "button", "glyph": "L-stick ↑", "upright": "stick up",    "sideways": "stick left",  "switchDual": "Left stick up" },
+        { "id": "stick_down",  "index": 15, "type": "button", "glyph": "L-stick ↓", "upright": "stick down",  "sideways": "stick right", "switchDual": "Left stick down" },
+        { "id": "stick_left",  "index": 13, "type": "button", "glyph": "L-stick ←", "upright": "stick left",  "sideways": "stick down",  "switchDual": "Left stick left" },
+        { "id": "stick_right", "index": 12, "type": "button", "glyph": "L-stick →", "upright": "stick right", "sideways": "stick up",    "switchDual": "Left stick right" },
+        { "id": "stick_click", "index": 10, "type": "button", "glyph": "L3",        "upright": "stick click", "sideways": "stick click", "switchDual": "L3 (left stick press)" },
+        { "id": "dpad_up",     "index": 3,  "type": "button", "glyph": "D-pad ↑",   "upright": "d-pad up",    "sideways": "d-pad left",  "switchDual": "D-pad up" },
+        { "id": "dpad_down",   "index": 0,  "type": "button", "glyph": "D-pad ↓",   "upright": "d-pad down",  "sideways": "d-pad right", "switchDual": "D-pad down" },
+        { "id": "dpad_left",   "index": 1,  "type": "button", "glyph": "D-pad ←",   "upright": "d-pad left",  "sideways": "d-pad down",  "switchDual": "D-pad left",  "verify": "Left/right may be swapped: indexes 1 and 2 do not follow the same 90-degree rotation as the stick. Re-check with the Joy-Con view." },
+        { "id": "dpad_right",  "index": 2,  "type": "button", "glyph": "D-pad →",   "upright": "d-pad right", "sideways": "d-pad up",    "switchDual": "D-pad right", "verify": "See dpad_left." },
+        { "id": "lb",          "index": 4,  "type": "button", "glyph": "LB",        "upright": "left bumper", "sideways": "rail side",   "switchDual": "L",  "sharesIndexWith": "rail_far" },
+        { "id": "lt",          "index": 6,  "type": "button", "glyph": "LT",        "upright": "left trigger", "sideways": "rail side",  "switchDual": "ZL", "analog": true },
+        { "id": "view",        "index": 9,  "type": "button", "glyph": "View",      "upright": "green button", "sideways": "green button", "switchDual": "Minus (−)" },
+        { "id": "bluetooth",   "index": 8,  "type": "button", "glyph": "Bluetooth", "upright": "grey Bluetooth button", "sideways": "grey Bluetooth button", "switchDual": "Capture", "warning": "Holding 3 s enters phone pairing; View + Bluetooth 5 s re-pairs the halves. Only bind to tap actions." },
+        { "id": "rail_near",   "index": 5,  "type": "button", "glyph": "Rail ●",    "upright": "rail button nearer the metal pin", "sideways": "rail button nearer the metal pin", "switchDual": "SL or SR (unverified which)", "verify": "Which rail button is SL and which is SR is not confirmed." },
+        { "id": "rail_far",    "index": 4,  "type": "button", "glyph": "Rail ○",    "upright": "rail button farther from the pin", "sideways": "rail button farther from the pin", "switchDual": "SL or SR (unverified which)", "verify": "Which rail button is SL and which is SR is not confirmed.", "sharesIndexWith": "lb" }
+      ]
+    },
+    "R": {
+      "joycon": "right",
+      "analogAxes": false,
+      "controls": [
+        { "id": "face_a",      "index": 3,  "type": "button", "glyph": "A",          "upright": "printed A (bottom)", "sideways": "printed A", "switchDual": "B (bottom position)", "note": "Sends standard index 3 (Y). A and Y are swapped versus Xbox." },
+        { "id": "face_b",      "index": 1,  "type": "button", "glyph": "B",          "upright": "printed B (right)",  "sideways": "printed B", "switchDual": "A (right position)" },
+        { "id": "face_x",      "index": 2,  "type": "button", "glyph": "X",          "upright": "printed X (left)",   "sideways": "printed X", "switchDual": "Y (left position)" },
+        { "id": "face_y",      "index": 0,  "type": "button", "glyph": "Y",          "upright": "printed Y (top)",    "sideways": "printed Y", "switchDual": "X (top position)", "note": "Sends standard index 0 (A). A and Y are swapped versus Xbox." },
+        { "id": "rb",          "index": 5,  "type": "button", "glyph": "RB",         "upright": "right bumper",  "sideways": "rail side", "switchDual": "R",  "sharesIndexWith": "rail_far" },
+        { "id": "rt",          "index": 7,  "type": "button", "glyph": "RT",         "upright": "right trigger", "sideways": "rail side", "switchDual": "ZR", "analog": true },
+        { "id": "menu",        "index": 9,  "type": "button", "glyph": "Menu",       "upright": "green button", "sideways": "green button", "switchDual": "Plus (+)" },
+        { "id": "screenshot",  "index": 8,  "type": "button", "glyph": "Screenshot", "upright": "grey button", "sideways": "grey button", "switchDual": "Home", "warning": "May also trigger a phone screenshot (manual shortcut). Untested in split mode." },
+        { "id": "rail_near",   "index": 4,  "type": "button", "glyph": "Rail ●",     "upright": "rail button nearer the metal pin", "sideways": "rail button nearer the metal pin", "switchDual": "SL or SR (unverified which)", "verify": "Which rail button is SL and which is SR is not confirmed." },
+        { "id": "rail_far",    "index": 5,  "type": "button", "glyph": "Rail ○",     "upright": "rail button farther from the pin", "sideways": "rail button farther from the pin", "switchDual": "SL or SR (unverified which)", "verify": "Which rail button is SL and which is SR is not confirmed.", "sharesIndexWith": "rb" }
+      ],
+      "ignore": [
+        { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "reason": "Swipes, taps and clicks emit random bursts of d-pad buttons in no stable pattern. Not usable as a right stick or d-pad. Ignore these indexes on -R." }
+      ]
+    }
+  }
+}

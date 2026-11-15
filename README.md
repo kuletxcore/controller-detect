@@ -16,3 +16,8 @@ Live: https://controller.kuletxcore.workers.dev
 ```bash
 npx wrangler deploy
 ```
+
+## GT NX split-mode profile
+
+- [`HANDOFF-gtnx-split-mode.md`](HANDOFF-gtnx-split-mode.md): what each half of the Infinix GT NX sends in split mode, and rules for mixed Xbox/Switch button prompts.
+- [`gtnx-split-profile.json`](gtnx-split-profile.json): the same map as data. The site serves it at `/gtnx-split-profile.json`, and the Joy-Con view reads it.

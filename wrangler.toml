@@ -3,7 +3,8 @@ main = "worker.js"
 compatibility_date = "2026-11-01"
 workers_dev = true
 
+# Both files are imported as plain strings and served as-is.
 [[rules]]
 type = "Text"
-globs = ["**/*.html"]
+globs = ["**/*.html", "**/*.json"]
 fallthrough = true
