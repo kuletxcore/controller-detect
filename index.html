@@ -50,6 +50,13 @@
   #verdict.bad { display: block; background: rgba(242,114,127,.12); border: 1px solid var(--bad); }
   #verdict.meh { display: block; background: rgba(246,196,83,.12); border: 1px solid var(--warn); }
   label { display: inline-flex; gap: 6px; align-items: center; }
+  #labPrompt .big { font-size: 22px; font-weight: 700; display: block; margin: 4px 0; }
+  #labPrompt .hint { color: var(--muted); font-size: 13px; }
+  #labTable { border-collapse: collapse; width: 100%; }
+  #labTable th, #labTable td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  #labTable th { color: var(--muted); font-weight: 600; }
+  #labTable td.none { color: var(--muted); }
+  #labTable tr.current td { background: rgba(79,209,165,.08); }
 </style>
 </head>
 <body>
@@ -67,13 +74,37 @@
 
   <section id="wizard">
     <h2>Split-mode test</h2>
-    <p class="muted" style="margin:0">Put the controller in split mode, then run this. It records which gamepad (index + id) each half reports as.</p>
+    <p class="muted" style="margin:0">Put the controller in split mode, then run this. It records which gamepad (index + id) each half reports as. Per the manual, split mode (yellow light) is switched on in the Infinix app and resets to combined mode at power-off. If a half still shows the old name without <code>-L</code>/<code>-R</code>, reconnect Bluetooth.</p>
     <div class="step" id="wizStep">Press <b>Start</b> to begin.</div>
     <div class="row">
       <button class="primary" id="wizStart">Start</button>
       <button id="wizReset">Reset</button>
     </div>
     <div id="verdict"></div>
+  </section>
+
+  <section id="labeler">
+    <h2>Button labeling</h2>
+    <p class="muted" style="margin:0">Walks through every physical control on the GT NX and records what each one sends: which half, which button or axis number, and its standard gamepad name. Hold each half <b>upright, as if it were attached to the phone</b> (bumpers on top). Directions below are in that orientation.</p>
+    <div class="row" style="margin-top:8px">
+      <button class="primary" data-profile="left">Label left half</button>
+      <button class="primary" data-profile="right">Label right half</button>
+      <button data-profile="both">Both halves</button>
+    </div>
+    <div class="step" id="labPrompt">Pick a half to start. Connect in split mode first (yellow light) so each half shows up on its own.</div>
+    <div class="row" id="labControls" style="display:none">
+      <button id="labSkip">Skip (nothing happens)</button>
+      <button id="labBack">Redo previous</button>
+      <button id="labStop">Stop</button>
+      <span class="muted" id="labProgress"></span>
+    </div>
+    <div id="labResult" style="display:none;margin-top:10px">
+      <div style="overflow-x:auto"><table id="labTable" class="mono"></table></div>
+      <div class="row" style="margin-top:8px">
+        <button id="labCopy">Copy table</button>
+        <button id="labSave">Download .txt</button>
+      </div>
+    </div>
   </section>
 
   <section>
@@ -263,7 +294,7 @@
         if (b.pressed !== p.b[i]) {
           p.b[i] = b.pressed;
           if (b.pressed) {
-            log(`index=${gp.index} button ${i} DOWN (value ${b.value.toFixed(2)})  id="${gp.id}"`);
+            log(`index=${gp.index} button ${i} [${btnName(gp, i)}] DOWN (value ${b.value.toFixed(2)})  id="${gp.id}"`);
             flash(gp.index);
             wizardInput(gp, `button ${i}`);
           } else {
@@ -276,11 +307,12 @@
         const crossed = (Math.abs(v) >= AXIS_THRESHOLD) !== (Math.abs(was) >= AXIS_THRESHOLD);
         if ($('logAxes').checked ? Math.abs(v - was) > 0.15 : crossed) {
           p.a[i] = v;
-          log(`index=${gp.index} axis ${i} = ${v.toFixed(2)}  id="${gp.id}"`);
+          log(`index=${gp.index} axis ${i} = ${v.toFixed(2)}${Math.abs(v) >= AXIS_THRESHOLD ? ` [${axisName(gp, i, v)}]` : ''}  id="${gp.id}"`);
           if (Math.abs(v) >= AXIS_THRESHOLD) { flash(gp.index); wizardInput(gp, `axis ${i}`); }
         }
       });
     }
+    labTick(pads());
     renderPads(false);
     requestAnimationFrame(tick);
   }
@@ -335,6 +367,205 @@
 
   $('wizStart').onclick = () => { wiz.left = wiz.right = null; $('verdict').className = ''; $('verdict').innerHTML = ''; setStep(1); log('WIZARD started', 'ev-info'); };
   $('wizReset').onclick = () => { wiz.left = wiz.right = null; $('verdict').className = ''; $('verdict').innerHTML = ''; setStep(0); };
+
+  // ---------- button labeling ----------
+  const RAIL = 'Tap it quickly: one of the rail buttons may be Power, and holding it 3 s turns that half off.';
+  const PROFILES = {
+    left: [
+      ['Stick: push UP', 'Left half, the thumbstick.'],
+      ['Stick: push DOWN'],
+      ['Stick: push LEFT'],
+      ['Stick: push RIGHT'],
+      ['Stick: click it in (L3)', 'Press straight down on the stick.'],
+      ['D-pad UP'],
+      ['D-pad DOWN'],
+      ['D-pad LEFT'],
+      ['D-pad RIGHT'],
+      ['LB', 'Left bumper, the small button on the top edge.'],
+      ['LT', 'Left trigger, the big one behind the bumper.'],
+      ['View (green button)'],
+      ['Bluetooth button', 'The grey button with the Bluetooth symbol.'],
+      ['Rail button nearer the metal pin', RAIL],
+      ['Rail button farther from the pin', RAIL],
+    ],
+    right: [
+      ['A button', 'The button printed A.'],
+      ['B button', 'The button printed B.'],
+      ['X button', 'The button printed X.'],
+      ['Y button', 'The button printed Y.'],
+      ['RB', 'Right bumper, the small button on the top edge.'],
+      ['RT', 'Right trigger, the big one behind the bumper.'],
+      ['Menu (green button)'],
+      ['Screenshot (grey button)'],
+      ['Touchpad: swipe UP'],
+      ['Touchpad: swipe DOWN'],
+      ['Touchpad: swipe LEFT'],
+      ['Touchpad: swipe RIGHT'],
+      ['Touchpad: tap it'],
+      ['Touchpad: press/click it', 'Skip this if the pad does not click.'],
+      ['Rail button nearer the metal pin', RAIL],
+      ['Rail button farther from the pin', RAIL],
+    ],
+  };
+  PROFILES.both = [
+    ...PROFILES.left.map(([n, h]) => ['L · ' + n, h]),
+    ...PROFILES.right.map(([n, h]) => ['R · ' + n, h]),
+  ];
+
+  const STD_BTN = ['A (bottom)', 'B (right)', 'X (left)', 'Y (top)', 'LB', 'RB', 'LT', 'RT', 'View/Back', 'Menu/Start',
+    'L3 (left stick click)', 'R3 (right stick click)', 'D-pad Up', 'D-pad Down', 'D-pad Left', 'D-pad Right', 'Home/Guide', 'Extra (17)'];
+  const STD_AXIS = [['Left stick', 'left', 'right'], ['Left stick', 'up', 'down'], ['Right stick', 'left', 'right'], ['Right stick', 'up', 'down']];
+  const btnName = (gp, n) => gp.mapping === 'standard' && STD_BTN[n] ? STD_BTN[n] : 'non-standard';
+  const axisName = (gp, n, dir) => {
+    const a = gp.mapping === 'standard' && STD_AXIS[n];
+    return a ? `${a[0]} ${dir < 0 ? a[1] : a[2]}` : 'non-standard';
+  };
+  const half = (id) => /-L\b/.test(id) ? 'L' : /-R\b/.test(id) ? 'R' : 'combined';
+  const shortName = (id) => id.replace(/\s*\(.*$/, '');
+
+  const lab = { list: null, i: 0, results: [], state: 'idle', notNeutralSince: 0, hits: null, firstHitAt: 0 };
+  const LAB_PRESS = 0.6, LAB_REST = 0.3, LAB_WINDOW = 250;
+
+  function labStart(profile) {
+    lab.list = PROFILES[profile];
+    lab.results = lab.list.map(() => null);
+    lab.i = 0;
+    $('labControls').style.display = '';
+    $('labResult').style.display = '';
+    log(`LABEL started (${profile})`, 'ev-info');
+    labArm();
+  }
+  function labArm() {
+    lab.state = 'release';
+    lab.hits = null;
+    lab.notNeutralSince = performance.now();
+    labRender();
+  }
+  function labNext() {
+    lab.i++;
+    if (lab.i >= lab.list.length) { labFinish(); return; }
+    labArm();
+  }
+  function labFinish() {
+    lab.state = 'done';
+    $('labPrompt').innerHTML = 'Done. The table below shows what each control sends. Copy or download it.';
+    $('labProgress').textContent = '';
+    log('LABEL finished', 'ev-info');
+    for (const line of labText().split('\n')) log('  ' + line, 'ev-info');
+    labRenderTable();
+  }
+  function labStop() {
+    if (lab.state === 'idle') return;
+    lab.state = 'idle';
+    $('labControls').style.display = 'none';
+    $('labPrompt').innerHTML = 'Stopped. Pick a half to start again.';
+    labRenderTable();
+  }
+
+  function labRender() {
+    if (!lab.list || lab.state === 'done' || lab.state === 'idle') return;
+    const [name, hint] = lab.list[lab.i];
+    const waiting = lab.state === 'release'
+      ? (performance.now() - lab.notNeutralSince > 1500 ? '<span class="hint">Let go of everything... (if this stays, a stick or trigger is not resting at zero)</span>' : '<span class="hint">Let go of everything...</span>')
+      : '<span class="hint">Waiting for input.</span>';
+    $('labPrompt').innerHTML = `<span class="hint">Step ${lab.i + 1} of ${lab.list.length}</span><span class="big">${name}</span>${hint ? `<span class="hint">${hint}</span><br>` : ''}${waiting}`;
+    $('labProgress').textContent = '';
+    labRenderTable();
+  }
+
+  function fmtHits(hits) {
+    return hits.map((h) => h.type === 'button'
+      ? `${h.half} button ${h.n}${h.value < 0.99 ? ` (analog ${h.value.toFixed(2)})` : ''} = ${h.std}`
+      : `${h.half} axis ${h.n} ${h.dir < 0 ? '−' : '+'} = ${h.std}`);
+  }
+
+  function labRenderTable() {
+    if (!lab.list) return;
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const rows = lab.list.map(([name], i) => {
+      const r = lab.results[i];
+      const cur = i === lab.i && (lab.state === 'release' || lab.state === 'listen') ? ' class="current"' : '';
+      if (r === null) return `<tr${cur}><td>${esc(name)}</td><td class="none">${cur ? '…' : ''}</td></tr>`;
+      if (r === 'skip') return `<tr${cur}><td>${esc(name)}</td><td class="none">nothing</td></tr>`;
+      return `<tr${cur}><td>${esc(name)}</td><td>${fmtHits(r).map(esc).join('<br>')}</td></tr>`;
+    }).join('');
+    $('labTable').innerHTML = `<tr><th>Control</th><th>Sends (L/R half)</th></tr>${rows}`;
+  }
+
+  function labText() {
+    if (!lab.list) return '';
+    const out = ['Control | Device | Sends', '--- | --- | ---'];
+    lab.list.forEach(([name], i) => {
+      const r = lab.results[i];
+      if (r === null) out.push(`${name} | | (not tested)`);
+      else if (r === 'skip') out.push(`${name} | | nothing`);
+      else out.push(`${name} | ${[...new Set(r.map((h) => h.devName))].join(', ')} | ${fmtHits(r).join('; ')}`);
+    });
+    return out.join('\n');
+  }
+
+  // Called every frame with all connected pads.
+  function labTick(list) {
+    if (lab.state !== 'release' && lab.state !== 'listen') return;
+    const now = performance.now();
+    if (lab.state === 'release') {
+      const neutral = list.every((gp) => gp.buttons.every((b) => !b.pressed && b.value < 0.1) && gp.axes.every((v) => Math.abs(v) < LAB_REST));
+      if (neutral) { lab.state = 'listen'; labRender(); }
+      else if (now - lab.notNeutralSince > 1500) labRender();
+      return;
+    }
+    // listen: collect every active input; once the first appears, keep collecting for a short window
+    for (const gp of list) {
+      gp.buttons.forEach((b, n) => {
+        if (b.pressed || b.value >= LAB_PRESS) labHit(gp, { type: 'button', n, value: b.value, std: btnName(gp, n) });
+      });
+      gp.axes.forEach((v, n) => {
+        if (Math.abs(v) >= LAB_PRESS) labHit(gp, { type: 'axis', n, dir: Math.sign(v), std: axisName(gp, n, v) });
+      });
+    }
+    if (lab.hits && now - lab.firstHitAt > LAB_WINDOW) {
+      lab.results[lab.i] = lab.hits;
+      log(`LABEL "${lab.list[lab.i][0]}" -> ${fmtHits(lab.hits).join('; ')}  [${[...new Set(lab.hits.map((h) => h.devName))].join(', ')}]`, 'ev-info');
+      labNext();
+    }
+  }
+  function labHit(gp, h) {
+    h.half = half(gp.id) === 'combined' ? `#${gp.index}` : half(gp.id);
+    h.devName = shortName(gp.id);
+    if (!lab.hits) { lab.hits = []; lab.firstHitAt = performance.now(); }
+    const key = (x) => `${x.devName}|${x.type}|${x.n}|${x.dir ?? ''}`;
+    const prevHit = lab.hits.find((x) => key(x) === key(h));
+    if (prevHit) { if (h.type === 'button') prevHit.value = Math.max(prevHit.value, h.value); }
+    else lab.hits.push(h);
+  }
+
+  document.querySelectorAll('[data-profile]').forEach((b) => b.addEventListener('click', () => labStart(b.dataset.profile)));
+  $('labSkip').onclick = () => {
+    if (lab.state !== 'release' && lab.state !== 'listen') return;
+    lab.results[lab.i] = 'skip';
+    log(`LABEL "${lab.list[lab.i][0]}" -> skipped (nothing happened)`, 'ev-info');
+    labNext();
+  };
+  $('labBack').onclick = () => {
+    if (!lab.list) return;
+    if (lab.state === 'done' || lab.state === 'idle') { lab.i = lab.list.length; $('labControls').style.display = ''; }
+    lab.i = Math.max(0, lab.i - 1);
+    lab.results[lab.i] = null;
+    labArm();
+  };
+  $('labStop').onclick = labStop;
+  const labExport = () => `GT NX button labels\n${env()}\n\n${labText()}\n`;
+  $('labCopy').onclick = async () => {
+    try { await navigator.clipboard.writeText(labExport()); log('Label table copied to clipboard', 'ev-info'); }
+    catch { log('Clipboard blocked; use Download instead', 'ev-info'); }
+  };
+  $('labSave').onclick = () => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([labExport()], { type: 'text/plain' }));
+    a.download = `gtnx-labels-${Date.now()}.txt`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
 
   // ---------- log tools ----------
   const env = () => `UA: ${navigator.userAgent}\nPage: ${location.href}\nTime: ${new Date().toISOString()}`;
