@@ -150,6 +150,57 @@ Every standard-gamepad index on each half, in index order. Use it as the lookup 
 | 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — never fires | — | — | — |
 | 17 | (extra) | `none` | — never fires | — | — | — |
 
+### Each half as a standalone Xbox controller (no GT NX profile)
+
+This is what a game sees if it skips the GT NX profile and treats each half as its own complete Xbox controller, the way any game that supports two Xbox pads would. Both halves identify as Microsoft Xbox Wireless Controllers (`045e:0b13`), so a game will do exactly this unless it matches the `-L`/`-R` names. ❌ rows are the inconsistencies this profile exists to fix.
+
+Across both halves:
+- **No analog sticks.** All 4 axes stay at 0. A game that moves or aims with the sticks gets nothing from either half. Movement only works if the game also accepts the D-pad.
+- **Rotated directions.** The left stick and the right touchpad arrive as D-pad presses turned 90°: left stick up is D-pad left, and touchpad up is D-pad right.
+- **The left d-pad is a face-button diamond.** Pressing d-pad up gives Y, so a game's "confirm" (A) is the left half's d-pad down.
+- **Labels don't match.** The right half's printed A and Y are swapped, and the green View button on the left half reads as Menu.
+- **Player slots aren't fixed.** Which half is player 1 changes between connections.
+
+#### Left half (`-L`) as an Xbox controller
+
+| Physical control | Index | A game sees (Xbox) | Matches? | Why not |
+|---|---|---|---|---|
+| d-pad down | 0 | A | ❌ | d-pad reads as a face button |
+| d-pad left | 1 | B | ❌ | d-pad reads as a face button |
+| d-pad right | 2 | X | ❌ | d-pad reads as a face button |
+| d-pad up | 3 | Y | ❌ | d-pad reads as a face button |
+| rail button farther from the pin | 4 | LB | ❌ | same input as LB |
+| rail button nearer the metal pin | 5 | RB | ❌ | rail button reads as RB |
+| grey Bluetooth button | 8 | View | ❌ | Bluetooth button reads as View; holding it starts pairing |
+| green button | 9 | Menu | ❌ | printed View, reads as Menu |
+| stick right | 12 | D-pad up | ❌ | stick reads as D-pad, rotated |
+| stick left | 13 | D-pad down | ❌ | stick reads as D-pad, rotated |
+| stick up | 14 | D-pad left | ❌ | stick reads as D-pad, rotated |
+| stick down | 15 | D-pad right | ❌ | stick reads as D-pad, rotated |
+| left bumper | 4 | LB | ✅ |  |
+| left trigger | 6 | LT | ✅ |  |
+| stick click | 10 | Left stick click (LS) | ✅ |  |
+
+#### Right half (`-R`) as an Xbox controller
+
+| Physical control | Index | A game sees (Xbox) | Matches? | Why not |
+|---|---|---|---|---|
+| printed Y (top) | 0 | A | ❌ | printed Y reads as A |
+| printed A (bottom) | 3 | Y | ❌ | printed A reads as Y |
+| rail button nearer the metal pin | 4 | LB | ❌ | rail button reads as LB |
+| rail button farther from the pin | 5 | RB | ❌ | same input as RB |
+| grey button | 8 | View | ❌ | Screenshot button reads as View |
+| swipe touchpad left | 12 | D-pad up | ❌ | touchpad reads as D-pad, rotated |
+| swipe touchpad right | 13 | D-pad down | ❌ | touchpad reads as D-pad, rotated |
+| swipe touchpad down | 14 | D-pad left | ❌ | touchpad reads as D-pad, rotated |
+| swipe touchpad up | 15 | D-pad right | ❌ | touchpad reads as D-pad, rotated |
+| printed B (right) | 1 | B | ✅ |  |
+| printed X (left) | 2 | X | ✅ |  |
+| right bumper | 5 | RB | ✅ |  |
+| right trigger | 7 | RT | ✅ |  |
+| green button | 9 | Menu | ✅ |  |
+| press the touchpad in | 11 | Right stick click (RS) | ✅ | only the click; there is no right stick to move |
+
 ## 5. Mixed prompt rules
 
 The hardware has Xbox labels in a Switch-style split shape. The prompts should show both.
