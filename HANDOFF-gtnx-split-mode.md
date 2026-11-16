@@ -42,178 +42,147 @@ Match on the **device name**, never on VID/PID.
 
 ## 3. Hardware facts that shape the profile
 
-1. **No analog input in split mode.** Neither half sends any axis values; all 4 axes stay at 0. The left stick comes through as **digital d-pad buttons** (8-way, no magnitude). In combined mode the stick is analog. Don't show analog-only prompts (e.g. "push gently") in split mode.
-2. **There's no right stick.** The right half has a touchpad that works as a **4-zone digital pad** on buttons 12–15 (one clean button per edge), plus a click on **index 11 (R3)**. See the right-half table in section 4. Early runs, before the mapping was changed, gave noisy bursts on 12–15; that no longer happens.
-3. **Each half reports in "sideways" orientation**, like a Switch Joy-Con held sideways. The left stick's directions are rotated 90°: pushing toward the bumpers reports "D-pad Left". The left d-pad reports as face-button indexes 0–3.
-4. **The right half's face buttons don't match their printed letters.** Printed **A sends index 3** (Xbox Y). Printed **Y sends index 0** (Xbox A). B and X match.
-5. **Each bumper shares an index with one rail button.** On L, LB and the rail button farther from the pin both send index 4. On R, RB and the far rail button both send index 5. You can't tell them apart in software.
-6. Both triggers are analog (`value` 0–1) and report as buttons 6 and 7.
-7. Rumble (`dual-rumble`) works on each half separately.
+1. **Hold each half sideways.** This is how the Infinix app shows split mode: each half held horizontally, with the rail (SL/SR) along the top. The left half has the stick on the left and the d-pad on the right. The right half has the face buttons on the left and the touchpad on the right. Everything below uses this grip. Upright is kept only as a reference column.
+2. **Each half is a complete controller, and both use the same indexes for the same roles.** The left d-pad and the right face buttons are the same face buttons. The left stick and the touchpad are the same stick. Bind by role, and either half works for any player.
+3. **Directions arrive unrotated in the sideways grip.** Stick or touchpad up sends D-pad Up (12), down sends 13, left sends 14 and right sends 15. Both are **digital**: all 4 axes stay at 0, so there is no analog movement or camera.
+4. **Face buttons follow the Switch sideways Joy-Con layout by standard index.** A (0) is on the right, B (1) on the bottom, X (2) on top and Y (3) on the left, on both halves. A game that binds "confirm" to A (0) gets the right-hand button of the cluster. The right half's printed letters don't match: printed Y sends A, and printed A sends Y.
+5. **SL and SR are indexes 4 and 5 on both halves.** They arrive as LB and RB. That's intended, but **prompt them as SL / SR**. The far-edge bumper sends the same index: LB = SL on the left half, RB = SR on the right. Software can't tell them apart.
+6. **Stick press:** 10 (L3) on the left half and 11 (R3) on the right (the touchpad pressed in). Treat both as "stick press". When the touchpad is pressed in, the edge under the finger fires 30–100 ms first, so cancel any 12–15 press that started in the last 150 ms when 11 goes down. Don't make the edges wait before counting: taps under ~120 ms were being lost.
+7. **System buttons:** both green buttons send 9 (Menu/Start), so either half can open a menu. Both grey buttons send 8: Bluetooth on the left half (holding it 3 s starts pairing) and Screenshot on the right (may also take a phone screenshot).
+8. **Triggers:** LT (6) only on the left half and RT (7) only on the right. Both are analog, 0–1, and on the far edge, so they're awkward in the sideways grip.
+9. Rumble (`dual-rumble`) works on each half separately.
 
-## 4. Input map
+## 4. Input map (sideways grip)
 
-"Upright" means the half held as if attached to the phone, bumpers on top. **Prompt glyph** is what to draw for that index. It's the label printed on the hardware or the physical control, not the standard-gamepad name.
+**Prompt** is what to draw. It's the label on the hardware: d-pad arrows point the way they face in the sideways grip, and SL/SR are shown for 4 and 5. The same data is in the JSON: `roles`, plus `role`, `sideways` and `glyph` on every control. The old upright glyph is kept as `uprightGlyph`.
 
-### Left half (`-L`)
+### Shared roles: the same on both halves
 
-| Index | Standard name (what software sees) | Physical control (upright) | Prompt glyph | Switch dual role |
-|---|---|---|---|---|
-| 14 | D-pad Left | Stick up | L-stick ↑ | Left stick up |
-| 15 | D-pad Right | Stick down | L-stick ↓ | Left stick down |
-| 13 | D-pad Down | Stick left | L-stick ← | Left stick left |
-| 12 | D-pad Up | Stick right | L-stick → | Left stick right |
-| 10 | L3 | Stick click | L3 | L3 |
-| 3 | Y | D-pad up | D-pad ↑ | D-pad up |
-| 0 | A | D-pad down | D-pad ↓ | D-pad down |
-| 1 | B | D-pad left | D-pad ← | D-pad left |
-| 2 | X | D-pad right | D-pad → | D-pad right |
-| 4 | LB | LB **and** far rail button (SL) | LB / SL | L / SL |
-| 6 | LT (analog) | LT | LT | ZL |
-| 9 | Start | Green View button | View | Minus (−) |
-| 8 | Back | Grey Bluetooth button | Bluetooth | Capture (tap only) |
-| 5 | RB | Rail button nearer the metal pin | SR | SR |
-
-The d-pad is **not** rotated like the stick. It reports as a face-button diamond mirrored left/right: up=Y, down=A, left=B, right=X. This was the same in all 4 labeling runs, so treat it as the real mapping.
-
-### Right half (`-R`)
-
-| Index | Standard name | Physical control | Prompt glyph | Switch dual role (by position) |
-|---|---|---|---|---|
-| 3 | Y | Printed **A** (bottom) | A | B |
-| 1 | B | Printed **B** (right) | B | A |
-| 2 | X | Printed **X** (left) | X | Y |
-| 0 | A | Printed **Y** (top) | Y | X |
-| 5 | RB | RB **and** far rail button (SR) | RB / SR | R / SR |
-| 7 | RT (analog) | RT | RT | ZR |
-| 9 | Start | Green Menu button | Menu | Plus (+) |
-| 8 | Back | Grey Screenshot button | Screenshot | Home |
-| 4 | LB | Rail button nearer the metal pin | SL | SL |
-| 11 | R3 | Touchpad pressed in (click) | Pad click | R3 |
-| 15 | D-pad Right | Touch/swipe touchpad top edge | Pad ↑ | R-stick up (digital) |
-| 14 | D-pad Left | Touch/swipe bottom edge | Pad ↓ | R-stick down (digital) |
-| 12 | D-pad Up | Touch/swipe left edge | Pad ← | R-stick left (digital) |
-| 13 | D-pad Down | Touch/swipe right edge | Pad → | R-stick right (digital) |
-
-The touchpad is a 4-zone digital pad: touching or swiping toward an edge fires that zone (same sideways rotation as the left stick). Confirmed in 3 runs. A plain tap in the middle fires whichever zone is nearest, so it isn't a separate input. A hard press sends 11, but the zone under the finger (usually 13) fires 30–100 ms first: when 11 goes down, cancel any 12–15 press that started in the last 150 ms.
+| Role | Prompt | Left half: control | L index | Right half: control | R index | Standard name |
+|---|---|---|---|---|---|---|
+| Direction up | Up | stick pushed up | 12 | touchpad, up edge | 12 | D-pad Up |
+| Direction down | Down | stick pushed down | 13 | touchpad, down edge | 13 | D-pad Down |
+| Direction left | Left | stick pushed left | 14 | touchpad, left edge | 14 | D-pad Left |
+| Direction right | Right | stick pushed right | 15 | touchpad, right edge | 15 | D-pad Right |
+| Face button, right (A: confirm) | A | right button of the d-pad | 0 | right face button (printed Y) | 0 | A |
+| Face button, bottom (B: back) | B | bottom button of the d-pad | 1 | bottom face button (printed B) | 1 | B |
+| Face button, top (X) | X | top button of the d-pad | 2 | top face button (printed X) | 2 | X |
+| Face button, left (Y) | Y | left button of the d-pad | 3 | left face button (printed A) | 3 | Y |
+| SL | SL | LB bumper, on the far edge (same input as SL) **/** left rail button (SL) | 4 | left rail button (SL) | 4 | LB |
+| SR | SR | right rail button (SR) | 5 | RB bumper, on the far edge (same input as SR) **/** right rail button (SR) | 5 | RB |
+| Stick press | Stick press | stick pressed in | 10 | touchpad pressed in | 11 | L3 / R3 |
+| Menu | − / + | green View button | 9 | green Menu button | 9 | Menu/Start |
+| Capture / Home | Capture / Home | grey Bluetooth button | 8 | grey Screenshot button | 8 | View/Back |
+| Trigger | ZL / ZR | LT, on the far edge | 6 | RT, on the far edge | 7 | LT / RT |
 
 ### Full index lookup (0–17)
 
-Every standard-gamepad index on each half, in index order. Use it as the lookup table: `(half, index)` → what to draw and what it does. The same data is in the JSON under `halves.<L|R>.byIndex`, and each control has a `soloSideways` field.
-
-- **Android input** is the keycode or axis Chrome reads for that index, so a native app should see the same thing (not tested natively).
-- **Solo sideways role** is the role when one player holds one half sideways, like a single Joy-Con. It's derived from the measured rotation: the left half turns 90° counter-clockwise and the right half 90° clockwise. Face roles follow the Nintendo diamond by position: right = A, bottom = B, left = Y, top = X.
-- A **/** means two physical controls send the same index.
-
 #### Left half (`-L`)
 
-| Index | Standard name | Android input | Physical control (upright) | Prompt glyph | Switch role (both halves) | Solo sideways role |
+| Index | Standard name | Android input | Role | Control (sideways grip) | Prompt glyph | Upright (reference) |
 |---|---|---|---|---|---|---|
-| 0 | A | `KEYCODE_BUTTON_A` | d-pad down | D-pad ↓ | D-pad down | A (right position) |
-| 1 | B | `KEYCODE_BUTTON_B` | d-pad left | D-pad ← | D-pad left | B (bottom position) |
-| 2 | X | `KEYCODE_BUTTON_X` | d-pad right | D-pad → | D-pad right | X (top position) |
-| 3 | Y | `KEYCODE_BUTTON_Y` | d-pad up | D-pad ↑ | D-pad up | Y (left position) |
-| 4 | LB | `KEYCODE_BUTTON_L1` | left bumper **/** rail button farther from the pin | LB **/** SL | L **/** SL | SL (same index as LB) **/** SL (left shoulder) |
-| 5 | RB | `KEYCODE_BUTTON_R1` | rail button nearer the metal pin | SR | SR | SR (right shoulder) |
-| 6 | LT | `AXIS_LTRIGGER` | left trigger | LT | ZL | (hard to reach sideways) |
-| 7 | RT | `AXIS_RTRIGGER` | — never fires | — | — | — |
-| 8 | Back/View | `KEYCODE_BUTTON_SELECT` | grey Bluetooth button | Bluetooth | Capture | Capture (tap only) |
-| 9 | Start/Menu | `KEYCODE_BUTTON_START` | green button | View | Minus (−) | Minus (menu) |
-| 10 | L3 | `KEYCODE_BUTTON_THUMBL` | stick click | L3 | L3 (left stick press) | Stick press |
-| 11 | R3 | `KEYCODE_BUTTON_THUMBR` | — never fires | — | — | — |
-| 12 | D-pad Up | `KEYCODE_DPAD_UP` | stick right | L-stick → | Left stick right | Stick up |
-| 13 | D-pad Down | `KEYCODE_DPAD_DOWN` | stick left | L-stick ← | Left stick left | Stick down |
-| 14 | D-pad Left | `KEYCODE_DPAD_LEFT` | stick up | L-stick ↑ | Left stick up | Stick left |
-| 15 | D-pad Right | `KEYCODE_DPAD_RIGHT` | stick down | L-stick ↓ | Left stick down | Stick right |
-| 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — never fires | — | — | — |
-| 17 | (extra) | `none` | — never fires | — | — | — |
+| 0 | A | `KEYCODE_BUTTON_A` | Face button, right (A: confirm) | right button of the d-pad | ▶ | d-pad down |
+| 1 | B | `KEYCODE_BUTTON_B` | Face button, bottom (B: back) | bottom button of the d-pad | ▼ | d-pad left |
+| 2 | X | `KEYCODE_BUTTON_X` | Face button, top (X) | top button of the d-pad | ▲ | d-pad right |
+| 3 | Y | `KEYCODE_BUTTON_Y` | Face button, left (Y) | left button of the d-pad | ◀ | d-pad up |
+| 4 | LB | `KEYCODE_BUTTON_L1` | SL | LB bumper, on the far edge (same input as SL) **/** left rail button (SL) | SL **/** SL | left bumper **/** rail button farther from the pin |
+| 5 | RB | `KEYCODE_BUTTON_R1` | SR | right rail button (SR) | SR | rail button nearer the metal pin |
+| 6 | LT | `AXIS_LTRIGGER` | Trigger | LT, on the far edge | LT | left trigger |
+| 7 | RT | `AXIS_RTRIGGER` | — | never fires on this half | — | — |
+| 8 | Back/View | `KEYCODE_BUTTON_SELECT` | Capture / Home | grey Bluetooth button | Bluetooth | grey Bluetooth button |
+| 9 | Start/Menu | `KEYCODE_BUTTON_START` | Menu | green View button | View (−) | green button |
+| 10 | L3 | `KEYCODE_BUTTON_THUMBL` | Stick press | stick pressed in | Stick press | stick click |
+| 11 | R3 | `KEYCODE_BUTTON_THUMBR` | — | never fires on this half | — | — |
+| 12 | D-pad Up | `KEYCODE_DPAD_UP` | Direction up | stick pushed up | Stick ↑ | stick right |
+| 13 | D-pad Down | `KEYCODE_DPAD_DOWN` | Direction down | stick pushed down | Stick ↓ | stick left |
+| 14 | D-pad Left | `KEYCODE_DPAD_LEFT` | Direction left | stick pushed left | Stick ← | stick up |
+| 15 | D-pad Right | `KEYCODE_DPAD_RIGHT` | Direction right | stick pushed right | Stick → | stick down |
+| 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — | never fires on this half | — | — |
+| 17 | (extra) | `none` | — | never fires on this half | — | — |
 
 #### Right half (`-R`)
 
-| Index | Standard name | Android input | Physical control (upright) | Prompt glyph | Switch role (both halves) | Solo sideways role |
+| Index | Standard name | Android input | Role | Control (sideways grip) | Prompt glyph | Upright (reference) |
 |---|---|---|---|---|---|---|
-| 0 | A | `KEYCODE_BUTTON_A` | printed Y (top) | Y | X (top position) | A (right position) |
-| 1 | B | `KEYCODE_BUTTON_B` | printed B (right) | B | A (right position) | B (bottom position) |
-| 2 | X | `KEYCODE_BUTTON_X` | printed X (left) | X | Y (left position) | X (top position) |
-| 3 | Y | `KEYCODE_BUTTON_Y` | printed A (bottom) | A | B (bottom position) | Y (left position) |
-| 4 | LB | `KEYCODE_BUTTON_L1` | rail button nearer the metal pin | SL | SL | SL (left shoulder) |
-| 5 | RB | `KEYCODE_BUTTON_R1` | right bumper **/** rail button farther from the pin | RB **/** SR | R **/** SR | SR (same index as RB) **/** SR (right shoulder) |
-| 6 | LT | `AXIS_LTRIGGER` | — never fires | — | — | — |
-| 7 | RT | `AXIS_RTRIGGER` | right trigger | RT | ZR | (hard to reach sideways) |
-| 8 | Back/View | `KEYCODE_BUTTON_SELECT` | grey button | Screenshot | Home | Home |
-| 9 | Start/Menu | `KEYCODE_BUTTON_START` | green button | Menu | Plus (+) | Plus (menu) |
-| 10 | L3 | `KEYCODE_BUTTON_THUMBL` | — never fires | — | — | — |
-| 11 | R3 | `KEYCODE_BUTTON_THUMBR` | press the touchpad in | Pad click | R3 (right stick press) | Stick press |
-| 12 | D-pad Up | `KEYCODE_DPAD_UP` | swipe touchpad left | Pad ← | Right stick left (flick) | Stick up |
-| 13 | D-pad Down | `KEYCODE_DPAD_DOWN` | swipe touchpad right | Pad → | Right stick right (flick) | Stick down |
-| 14 | D-pad Left | `KEYCODE_DPAD_LEFT` | swipe touchpad down | Pad ↓ | Right stick down (flick) | Stick left |
-| 15 | D-pad Right | `KEYCODE_DPAD_RIGHT` | swipe touchpad up | Pad ↑ | Right stick up (flick) | Stick right |
-| 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — never fires | — | — | — |
-| 17 | (extra) | `none` | — never fires | — | — | — |
+| 0 | A | `KEYCODE_BUTTON_A` | Face button, right (A: confirm) | right face button (printed Y) | Y | printed Y (top) |
+| 1 | B | `KEYCODE_BUTTON_B` | Face button, bottom (B: back) | bottom face button (printed B) | B | printed B (right) |
+| 2 | X | `KEYCODE_BUTTON_X` | Face button, top (X) | top face button (printed X) | X | printed X (left) |
+| 3 | Y | `KEYCODE_BUTTON_Y` | Face button, left (Y) | left face button (printed A) | A | printed A (bottom) |
+| 4 | LB | `KEYCODE_BUTTON_L1` | SL | left rail button (SL) | SL | rail button nearer the metal pin |
+| 5 | RB | `KEYCODE_BUTTON_R1` | SR | RB bumper, on the far edge (same input as SR) **/** right rail button (SR) | SR **/** SR | right bumper **/** rail button farther from the pin |
+| 6 | LT | `AXIS_LTRIGGER` | — | never fires on this half | — | — |
+| 7 | RT | `AXIS_RTRIGGER` | Trigger | RT, on the far edge | RT | right trigger |
+| 8 | Back/View | `KEYCODE_BUTTON_SELECT` | Capture / Home | grey Screenshot button | Screenshot | grey button |
+| 9 | Start/Menu | `KEYCODE_BUTTON_START` | Menu | green Menu button | Menu (+) | green button |
+| 10 | L3 | `KEYCODE_BUTTON_THUMBL` | — | never fires on this half | — | — |
+| 11 | R3 | `KEYCODE_BUTTON_THUMBR` | Stick press | touchpad pressed in | Pad press | press the touchpad in |
+| 12 | D-pad Up | `KEYCODE_DPAD_UP` | Direction up | touchpad, up edge | Pad ↑ | swipe touchpad left |
+| 13 | D-pad Down | `KEYCODE_DPAD_DOWN` | Direction down | touchpad, down edge | Pad ↓ | swipe touchpad right |
+| 14 | D-pad Left | `KEYCODE_DPAD_LEFT` | Direction left | touchpad, left edge | Pad ← | swipe touchpad down |
+| 15 | D-pad Right | `KEYCODE_DPAD_RIGHT` | Direction right | touchpad, right edge | Pad → | swipe touchpad up |
+| 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — | never fires on this half | — | — |
+| 17 | (extra) | `none` | — | never fires on this half | — | — |
 
 ### Each half as a standalone Xbox controller (no GT NX profile)
 
-This is what a game sees if it skips the GT NX profile and treats each half as its own complete Xbox controller, the way any game that supports two Xbox pads would. Both halves identify as Microsoft Xbox Wireless Controllers (`045e:0b13`), so a game will do exactly this unless it matches the `-L`/`-R` names. ❌ rows are the inconsistencies this profile exists to fix.
+This is what a game sees if it skips the GT NX profile and treats each half as its own Xbox controller. Both halves identify as Microsoft Xbox Wireless Controllers (`045e:0b13`), so any game will do this unless it matches the `-L`/`-R` names. In the sideways grip most of it already works. What doesn't:
+- There are no analog sticks; movement only works if the game also accepts the D-pad.
+- The face buttons sit in Switch positions, so Xbox prompts point at the wrong button. The right half's printed A and Y are also swapped.
+- The grey button arrives as View.
+- Which half becomes player 1 changes between connections.
 
-Across both halves:
-- **No analog sticks.** All 4 axes stay at 0. A game that moves or aims with the sticks gets nothing from either half. Movement only works if the game also accepts the D-pad.
-- **Rotated directions.** The left stick and the right touchpad arrive as D-pad presses turned 90°: left stick up is D-pad left, and touchpad up is D-pad right.
-- **The left d-pad is a face-button diamond.** Pressing d-pad up gives Y, so a game's "confirm" (A) is the left half's d-pad down.
-- **Labels don't match.** The right half's printed A and Y are swapped, and the green View button on the left half reads as Menu.
-- **Player slots aren't fixed.** Which half is player 1 changes between connections.
+#### Left half (`-L`)
 
-#### Left half (`-L`) as an Xbox controller
-
-| Physical control | Index | A game sees (Xbox) | Matches? | Why not |
+| Control (sideways grip) | Index | A game sees (Xbox) | OK? | Note |
 |---|---|---|---|---|
-| d-pad down | 0 | A | ❌ | d-pad reads as a face button |
-| d-pad left | 1 | B | ❌ | d-pad reads as a face button |
-| d-pad right | 2 | X | ❌ | d-pad reads as a face button |
-| d-pad up | 3 | Y | ❌ | d-pad reads as a face button |
-| rail button farther from the pin | 4 | LB | ❌ | same input as LB |
-| rail button nearer the metal pin | 5 | RB | ❌ | rail button reads as RB |
-| grey Bluetooth button | 8 | View | ❌ | Bluetooth button reads as View; holding it starts pairing |
-| green button | 9 | Menu | ❌ | printed View, reads as Menu |
-| stick right | 12 | D-pad up | ❌ | stick reads as D-pad, rotated |
-| stick left | 13 | D-pad down | ❌ | stick reads as D-pad, rotated |
-| stick up | 14 | D-pad left | ❌ | stick reads as D-pad, rotated |
-| stick down | 15 | D-pad right | ❌ | stick reads as D-pad, rotated |
-| left bumper | 4 | LB | ✅ |  |
-| left trigger | 6 | LT | ✅ |  |
-| stick click | 10 | Left stick click (LS) | ✅ |  |
+| right button of the d-pad | 0 | A | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top) |
+| bottom button of the d-pad | 1 | B | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top) |
+| top button of the d-pad | 2 | X | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top) |
+| left button of the d-pad | 3 | Y | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top) |
+| grey Bluetooth button | 8 | View/Back | ❌ | arrives as View/Back; holding it starts pairing |
+| LB bumper, on the far edge (same input as SL) | 4 | LB | ✅ | SL/SR arrive as LB (intended); show SL/SR prompts |
+| left rail button (SL) | 4 | LB | ✅ | SL/SR arrive as LB (intended); show SL/SR prompts |
+| right rail button (SR) | 5 | RB | ✅ | SL/SR arrive as RB (intended); show SL/SR prompts |
+| LT, on the far edge | 6 | LT | ✅ | LT only on the left half, RT only on the right |
+| green View button | 9 | Menu/Start | ✅ | both halves send Menu/Start (9) |
+| stick pressed in | 10 | L3 | ✅ | L3 on the left half, R3 on the right half; treat both as "stick press" |
+| stick pushed up | 12 | D-pad Up | ✅ | correct direction, but as a digital D-pad, never an analog stick |
+| stick pushed down | 13 | D-pad Down | ✅ | correct direction, but as a digital D-pad, never an analog stick |
+| stick pushed left | 14 | D-pad Left | ✅ | correct direction, but as a digital D-pad, never an analog stick |
+| stick pushed right | 15 | D-pad Right | ✅ | correct direction, but as a digital D-pad, never an analog stick |
 
-#### Right half (`-R`) as an Xbox controller
+#### Right half (`-R`)
 
-| Physical control | Index | A game sees (Xbox) | Matches? | Why not |
+| Control (sideways grip) | Index | A game sees (Xbox) | OK? | Note |
 |---|---|---|---|---|
-| printed Y (top) | 0 | A | ❌ | printed Y reads as A |
-| printed A (bottom) | 3 | Y | ❌ | printed A reads as Y |
-| rail button nearer the metal pin | 4 | LB | ❌ | rail button reads as LB |
-| rail button farther from the pin | 5 | RB | ❌ | same input as RB |
-| grey button | 8 | View | ❌ | Screenshot button reads as View |
-| swipe touchpad left | 12 | D-pad up | ❌ | touchpad reads as D-pad, rotated |
-| swipe touchpad right | 13 | D-pad down | ❌ | touchpad reads as D-pad, rotated |
-| swipe touchpad down | 14 | D-pad left | ❌ | touchpad reads as D-pad, rotated |
-| swipe touchpad up | 15 | D-pad right | ❌ | touchpad reads as D-pad, rotated |
-| printed B (right) | 1 | B | ✅ |  |
-| printed X (left) | 2 | X | ✅ |  |
-| right bumper | 5 | RB | ✅ |  |
-| right trigger | 7 | RT | ✅ |  |
-| green button | 9 | Menu | ✅ |  |
-| press the touchpad in | 11 | Right stick click (RS) | ✅ | only the click; there is no right stick to move |
+| right face button (printed Y) | 0 | A | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top); printed Y sends A |
+| bottom face button (printed B) | 1 | B | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top) |
+| top face button (printed X) | 2 | X | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top) |
+| left face button (printed A) | 3 | Y | ❌ | Switch sideways position (A right, B bottom, X top, Y left), not Xbox (A bottom, B right, X left, Y top); printed A sends Y |
+| grey Screenshot button | 8 | View/Back | ❌ | arrives as View/Back; may also take a phone screenshot |
+| left rail button (SL) | 4 | LB | ✅ | SL/SR arrive as LB (intended); show SL/SR prompts |
+| RB bumper, on the far edge (same input as SR) | 5 | RB | ✅ | SL/SR arrive as RB (intended); show SL/SR prompts |
+| right rail button (SR) | 5 | RB | ✅ | SL/SR arrive as RB (intended); show SL/SR prompts |
+| RT, on the far edge | 7 | RT | ✅ | LT only on the left half, RT only on the right |
+| green Menu button | 9 | Menu/Start | ✅ | both halves send Menu/Start (9) |
+| touchpad pressed in | 11 | R3 | ✅ | L3 on the left half, R3 on the right half; treat both as "stick press" |
+| touchpad, up edge | 12 | D-pad Up | ✅ | correct direction, but as a digital D-pad, never an analog stick |
+| touchpad, down edge | 13 | D-pad Down | ✅ | correct direction, but as a digital D-pad, never an analog stick |
+| touchpad, left edge | 14 | D-pad Left | ✅ | correct direction, but as a digital D-pad, never an analog stick |
+| touchpad, right edge | 15 | D-pad Right | ✅ | correct direction, but as a digital D-pad, never an analog stick |
 
 ## 5. Mixed prompt rules
 
 The hardware has Xbox labels in a Switch-style split shape. The prompts should show both.
 
-1. **Glyph comes from the hardware label.** For `-R` index 3 draw **A**, not Y. For `-L` index 3 draw a **d-pad up arrow**, not Y. Look glyphs up by `(half, index)`, never by standard-gamepad name alone.
-2. **Use Xbox shapes for shoulders and system buttons:** LB/LT/RB/RT, View, Menu. Those are what's printed.
-3. **Use Switch concepts for the layout:**
-   - Show a left or right Joy-Con silhouette so the player knows which half to look at.
-   - Call the rail buttons SL/SR-style "rail" buttons.
-   - Show Minus/Plus/Capture/Home as the role when a game expects Switch semantics.
-4. **Tag every prompt with the half** when both are connected. For example, "L · LB" or "R · A". Both halves use the same index numbers for different things: index 3 is the d-pad up arrow on L and the A button on R.
-5. **Shared indexes:** SL and SR are index 4 and 5 on both halves. Held upright, show **LB**/**RB**. Held sideways (one half per player), show **SL**/**SR**, as on a Joy-Con.
-6. **No analog prompts in split mode.** Hide sensitivity sliders, "hold halfway" hints and right-stick prompts. Show a note that this game needs a right stick if it does. R3 actions can still be prompted as "Pad click" on `-R`.
+1. **Bind by role, not by half.** Use the shared-roles table. Both halves send the same index for the same role (face 0–3, directions 12–15, SL/SR 4/5, menu 9), so a single binding works on either half. The only per-half difference is stick press: 10 on the left half, 11 on the right.
+2. **Prompt with the hardware label in the sideways grip.** Look glyphs up by `(half, index)`:
+   - **Left half face role:** an arrow pointing the way that d-pad button faces sideways. A is ▶, B is ▼, X is ▲, Y is ◀.
+   - **Right half face role:** the printed letter. A is printed **Y**, B is **B**, X is **X**, Y is printed **A**.
+3. **SL / SR, never LB / RB, in split mode.** Indexes 4 and 5 always show SL and SR, even though they arrive as LB and RB and the bumper sends the same input.
+4. **Use Switch concepts for the layout:** show a sideways left or right Joy-Con silhouette so each player knows which half they hold. Show Minus/Plus/Capture/Home as the role when a game expects Switch semantics.
+5. **Tag prompts with the half when both are in use by one player.** For example, "L · ▶" or "R · Y". With one half per player, show only that half's prompts.
+6. **No analog prompts in split mode.** Hide sensitivity sliders, "hold halfway" hints and second-stick prompts. Show a note if the game needs a right stick.
 7. **Warnings:** don't map hold actions to the left Bluetooth button. Holding it 3 s starts pairing. Treat the right Screenshot button as possibly also taking a phone screenshot.
 
 ## 6. Still unverified
@@ -222,7 +191,8 @@ Measured on one unit over 4 labeling runs, on an Infinix GT 50 Pro (model X6891,
 
 - [x] D-pad left/right on `-L`: left=1, right=2, confirmed in 4 runs.
 - [x] Touchpad click on `-R` sends index 11 (R3), confirmed in 3 runs.
-- [x] SL/SR: the pin is at the end opposite the shoulders, so **SL = index 4 and SR = index 5 on both halves**, same as a real Joy-Con. Worked out from a photo of both rails, not a button test.
+- [x] SL/SR: **SL = index 4 and SR = index 5 on both halves**, same as a real Joy-Con. Confirmed by the sideways grip in the Infinix app (rail on top) and the photo of both rails.
+- [x] Sideways grip: directions and face buttons match the Switch sideways Joy-Con layout by standard index. Derived from the measured map, matches the app's picture.
 - [x] Touchpad: 4 edge zones confirmed in 3 runs; click = 11 on every hard press.
 - [ ] Whether a native Android app sees the same indexes. Expect the same Android keycodes, because Chrome's standard mapping comes from Android's KEYCODE_BUTTON_* events. Not tested in a native app.
 - [ ] Whether the right Screenshot button also takes a phone screenshot in split mode.
