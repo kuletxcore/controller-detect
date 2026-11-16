@@ -15,6 +15,16 @@ Test tool: https://controller.kuletxcore.workers.dev (Split-mode test, Button la
   - Native: blue indicator, name `GT NX Controller`, normal Xbox.
   - Mapping: green indicator, name `GT NX Controller-T`, touch-mapping mode.
 
+### Official tutorial (reference)
+
+Infinix's own video: [`docs/infinix-split-mode-tutorial.mp4`](docs/infinix-split-mode-tutorial.mp4) (80 s). Key frames: [`docs/infinix-split-mode-tutorial-frames.jpg`](docs/infinix-split-mode-tutorial-frames.jpg).
+
+What it shows:
+1. **Switch to split mode:** take the left and right halves off the main body (both charged). In the GT NX Controller Settings app, tap **Split Mode**. The indicator flashes **yellow**.
+2. **Play:** hold one half in each hand, or give one half to each player (sideways, Joy-Con style), and follow the in-game controls. Infinix says compatibility varies per game, and the app warns that games without split-mode support can't use it.
+3. **Back to combined:** either restart the controller (it restores the last-used mode; the settings page can only restore Native mode), or put both halves back on the main body (the right half goes on with the side marked "X" facing up), tap **Combined Mode**, then **Connect**.
+4. Fine print: split mode is supported on selected Infinix phones only. On first connection the controller defaults to Mapping mode and then remembers the last-used mode. The demo uses a GT 50 Pro.
+
 ## 2. Detection
 
 Match on the **device name**, never on VID/PID.
