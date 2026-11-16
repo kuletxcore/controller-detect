@@ -4,7 +4,7 @@
   "measured": {
     "date": "2026-11-16",
     "runs": 4,
-    "platform": "Android 10, Chrome 157, Web Gamepad API (mapping: standard)",
+    "platform": "Infinix GT 50 Pro (X6891, Android 16, build 16.3.0.155SP08), Chrome 157 (UA reduced to 'Android 10; K'), Web Gamepad API (mapping: standard)",
     "units": 1,
     "tool": "https://controller.kuletxcore.workers.dev (Button labeling)"
   },
