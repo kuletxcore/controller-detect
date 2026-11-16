@@ -71,8 +71,8 @@
         { "id": "rail_near",   "index": 4,  "type": "button", "glyph": "SL",         "upright": "rail button nearer the metal pin", "sideways": "left rail button", "switchDual": "SL", "note": "Pin end is opposite the shoulders, so held sideways this button is on the left." },
         { "id": "rail_far",    "index": 5,  "type": "button", "glyph": "SR",         "upright": "rail button farther from the pin", "sideways": "right rail button", "switchDual": "SR", "sharesIndexWith": "rb" }
       ],
-      "noiseNotes": [
-        { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "reason": "Swipes, taps and clicks emit random bursts of d-pad buttons in no stable pattern. Not usable as a right stick or d-pad. Ignore these indexes on -R. Index 11 (touchpad click) is separate and usable." }
+      "history": [
+        { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "note": "Superseded. Early runs, before the right-half mapping was changed, gave noisy bursts of 12-15 per swipe. Since then each edge sends one clean button (see pad_swipe_*). Do not ignore these indexes." }
       ]
     }
   }
