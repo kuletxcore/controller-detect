@@ -140,6 +140,7 @@
       <h2 style="margin:0">Event log</h2>
       <div class="row">
         <label><input type="checkbox" id="logAxes"> log stick movement</label>
+        <label title="Logs keyboard events the browser fires. On Android, controller presses can also arrive as arrow/Enter keys."><input type="checkbox" id="logKeys" checked> log key events</label>
         <button id="copyLog">Copy</button>
         <button id="saveLog">Download .txt</button>
         <button id="dumpBtn">Dump full state</button>
@@ -213,6 +214,18 @@
   }
 
   const pads = () => Array.from(navigator.getGamepads ? navigator.getGamepads() : []).filter(Boolean);
+
+  // ---------- keyboard events (does the controller also send keys?) ----------
+  // On Android a gamepad's D-pad / A / B can also reach the page as ArrowX / Enter key events,
+  // in the controller's raw orientation. A site with keyboard shortcuts then acts on both.
+  for (const type of ['keydown', 'keyup']) {
+    window.addEventListener(type, (e) => {
+      if (!$('logKeys').checked || e.repeat) return;
+      const t = e.target;
+      if (t && ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) && t.type !== 'checkbox') return;
+      log(`KEY ${type === 'keydown' ? 'DOWN' : 'up  '} key="${e.key}" code="${e.code}" keyCode=${e.keyCode}`, 'ev-key');
+    }, true);
+  }
 
   // ---------- connect / disconnect ----------
   window.addEventListener('gamepadconnected', (e) => {
