@@ -1,6 +1,6 @@
 {
   "profile": "infinix-gt-nx-split",
-  "version": 3,
+  "version": 4,
   "measured": {
     "date": "2026-11-16",
     "runs": 4,
@@ -63,15 +63,15 @@
         { "id": "rt",          "index": 7,  "type": "button", "glyph": "RT",         "upright": "right trigger", "sideways": "rail side", "switchDual": "ZR", "analog": true },
         { "id": "menu",        "index": 9,  "type": "button", "glyph": "Menu",       "upright": "green button", "sideways": "green button", "switchDual": "Plus (+)" },
         { "id": "screenshot",  "index": 8,  "type": "button", "glyph": "Screenshot", "upright": "grey button", "sideways": "grey button", "switchDual": "Home", "warning": "May also trigger a phone screenshot (manual shortcut). Untested in split mode." },
-        { "id": "touchpad_click", "index": 11, "type": "button", "glyph": "Pad click", "upright": "press the touchpad in", "sideways": "press the touchpad in", "switchDual": "R3 (right stick press)", "verify": "Sent index 11 in 3 earlier runs, but only index 14 in the latest run after the right-half mapping was changed. Re-check." },
-        { "id": "pad_swipe_up",    "index": 15, "type": "button", "glyph": "Pad ↑", "upright": "swipe touchpad up",    "sideways": "swipe right", "switchDual": "Right stick up (flick)",    "verify": "Clean in 1 run after the mapping fix." },
-        { "id": "pad_swipe_down",  "index": 14, "type": "button", "glyph": "Pad ↓", "upright": "swipe touchpad down",  "sideways": "swipe left",  "switchDual": "Right stick down (flick)",  "verify": "Clean in 1 run after the mapping fix. Tap and click also sent 14 in that run." },
-        { "id": "pad_swipe_left",  "index": 12, "type": "button", "glyph": "Pad ←", "upright": "swipe touchpad left",  "sideways": "swipe up",    "switchDual": "Right stick left (flick)",  "verify": "Clean in 1 run after the mapping fix." },
-        { "id": "pad_swipe_right", "index": 13, "type": "button", "glyph": "Pad →", "upright": "swipe touchpad right", "sideways": "swipe down",  "switchDual": "Right stick right (flick)", "verify": "Clean in 1 run after the mapping fix." },
+        { "id": "touchpad_click", "index": 11, "type": "button", "glyph": "Pad click", "upright": "press the touchpad in", "sideways": "press the touchpad in", "switchDual": "R3 (right stick press)", "note": "Confirmed: 11 on every hard press (8+ presses over 2 sessions). The edge zone under the finger fires ~30-100 ms first (usually 13); on 11 down, cancel any 12-15 press that began in the last 150 ms." },
+        { "id": "pad_swipe_up",    "index": 15, "type": "button", "glyph": "Pad ↑", "upright": "swipe touchpad up",    "sideways": "swipe right", "switchDual": "Right stick up (flick)",    "note": "Confirmed in 3 runs: touch or swipe toward the up edge. Works as a digital d-pad zone." },
+        { "id": "pad_swipe_down",  "index": 14, "type": "button", "glyph": "Pad ↓", "upright": "swipe touchpad down",  "sideways": "swipe left",  "switchDual": "Right stick down (flick)",  "note": "Confirmed in 3 runs: touch or swipe toward the down edge. Works as a digital d-pad zone." },
+        { "id": "pad_swipe_left",  "index": 12, "type": "button", "glyph": "Pad ←", "upright": "swipe touchpad left",  "sideways": "swipe up",    "switchDual": "Right stick left (flick)",  "note": "Confirmed in 3 runs: touch or swipe toward the left edge. Works as a digital d-pad zone." },
+        { "id": "pad_swipe_right", "index": 13, "type": "button", "glyph": "Pad →", "upright": "swipe touchpad right", "sideways": "swipe down",  "switchDual": "Right stick right (flick)", "note": "Confirmed in 3 runs: touch or swipe toward the right edge. Works as a digital d-pad zone." },
         { "id": "rail_near",   "index": 4,  "type": "button", "glyph": "SL",         "upright": "rail button nearer the metal pin", "sideways": "left rail button", "switchDual": "SL", "note": "Pin end is opposite the shoulders, so held sideways this button is on the left." },
         { "id": "rail_far",    "index": 5,  "type": "button", "glyph": "SR",         "upright": "rail button farther from the pin", "sideways": "right rail button", "switchDual": "SR", "sharesIndexWith": "rb" }
       ],
-      "ignoreBeforeFix": [
+      "noiseNotes": [
         { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "reason": "Swipes, taps and clicks emit random bursts of d-pad buttons in no stable pattern. Not usable as a right stick or d-pad. Ignore these indexes on -R. Index 11 (touchpad click) is separate and usable." }
       ]
     }

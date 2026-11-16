@@ -27,7 +27,7 @@ Match on the **device name**, never on VID/PID.
 - Both halves, and combined mode, report vendor `045e` and product `0b13`. Those are Microsoft's Xbox Wireless Controller IDs, which the GT NX spoofs. So VID/PID can't tell the halves apart, or tell the GT NX from a real Xbox pad.
 - The on-box manual says `GT NX Controller-*`. An older printing says `Infinix Controller-*`. Match both.
 - **Don't key on slot order.** Gamepad index 0/1 swaps between connections. One run had L=0 and R=1, another had R=0 and L=1.
-- **Stale name:** right after switching to split mode, the left half can keep the old combined name (`GT NX Controller`, no suffix) until Bluetooth reconnects. If you see exactly one `-R` plus one un-suffixed `GT NX Controller`, treat the un-suffixed one as L. Or tell the user to reconnect.
+- **Stale name** (seen in early runs; after a reconnect the left half reported `GT NX Controller-L` correctly): right after switching to split mode, the left half can keep the old combined name (`GT NX Controller`, no suffix) until Bluetooth reconnects. If you see exactly one `-R` plus one un-suffixed `GT NX Controller`, treat the un-suffixed one as L. Or tell the user to reconnect.
 - Activate the split profile only when an `-L` or `-R` half is present. Each half works alone (one-half play), so don't require both.
 
 ## 3. Hardware facts that shape the profile
@@ -78,13 +78,13 @@ The d-pad is **not** rotated like the stick. It reports as a face-button diamond
 | 9 | Start | Green Menu button | Menu | Plus (+) |
 | 8 | Back | Grey Screenshot button | Screenshot | Home |
 | 4 | LB | Rail button nearer the metal pin | SL | SL |
-| 11 | R3 | Touchpad click (earlier runs) ⚠ | Pad click | R3 |
-| 15 | D-pad Right | Touchpad swipe up ⚠ | Pad ↑ | R-stick up flick |
-| 14 | D-pad Left | Touchpad swipe down ⚠ | Pad ↓ | R-stick down flick |
-| 12 | D-pad Up | Touchpad swipe left ⚠ | Pad ← | R-stick left flick |
-| 13 | D-pad Down | Touchpad swipe right ⚠ | Pad → | R-stick right flick |
+| 11 | R3 | Touchpad pressed in (click) | Pad click | R3 |
+| 15 | D-pad Right | Touch/swipe touchpad top edge | Pad ↑ | R-stick up (digital) |
+| 14 | D-pad Left | Touch/swipe bottom edge | Pad ↓ | R-stick down (digital) |
+| 12 | D-pad Up | Touch/swipe left edge | Pad ← | R-stick left (digital) |
+| 13 | D-pad Down | Touch/swipe right edge | Pad → | R-stick right (digital) |
 
-⚠ Touchpad: before the user changed the right-half mapping, swipes sent random bursts of 12–15 and a click sent 11. After the change, each swipe sent one clean button, rotated like a sideways Joy-Con, but tap and click both sent 14. One run so far, so keep a fallback: if swipes look noisy (more than one of 12–15 within ~150 ms), ignore 12–15.
+The touchpad is a 4-zone digital pad: touching or swiping toward an edge fires that zone (same sideways rotation as the left stick). Confirmed in 3 runs. A plain tap in the middle fires whichever zone is nearest, so it isn't a separate input. A hard press sends 11, but the zone under the finger (usually 13) fires 30–100 ms first: when 11 goes down, cancel any 12–15 press that started in the last 150 ms.
 
 ## 5. Mixed prompt rules
 
@@ -108,7 +108,7 @@ Measured on one unit over 4 labeling runs, Android 10, Chrome 157, Web Gamepad A
 - [x] D-pad left/right on `-L`: left=1, right=2, confirmed in 4 runs.
 - [x] Touchpad click on `-R` sends index 11 (R3), confirmed in 3 runs.
 - [x] SL/SR: the pin is at the end opposite the shoulders, so **SL = index 4 and SR = index 5 on both halves**, same as a real Joy-Con. Worked out from a photo of both rails, not a button test.
-- [ ] Touchpad swipes after the mapping fix (1 run), and whether click sends 11 or 14.
+- [x] Touchpad: 4 edge zones confirmed in 3 runs; click = 11 on every hard press.
 - [ ] Whether a native Android app sees the same indexes. Expect the same Android keycodes, because Chrome's standard mapping comes from Android's KEYCODE_BUTTON_* events. Not tested in a native app.
 - [ ] Whether the right Screenshot button also takes a phone screenshot in split mode.
 - [ ] Whether newer firmware changes any of this. Re-run the labeling tool after an update.
