@@ -17,12 +17,12 @@ Test tool: https://controller.kuletxcore.workers.dev (Split-mode test, Button la
 
 ### Official tutorial (reference)
 
-Infinix's own video: [`docs/infinix-split-mode-tutorial.mp4`](docs/infinix-split-mode-tutorial.mp4) (80 s). Key frames: [`docs/infinix-split-mode-tutorial-frames.jpg`](docs/infinix-split-mode-tutorial-frames.jpg).
+Infinix's own video: [`docs/infinix-split-mode-tutorial.mp4`](docs/infinix-split-mode-tutorial.mp4) (80 s). Key frames: [`docs/infinix-split-mode-tutorial-frames.jpg`](docs/infinix-split-mode-tutorial-frames.jpg). Narration transcript: [`docs/infinix-split-mode-tutorial-transcript.md`](docs/infinix-split-mode-tutorial-transcript.md).
 
 What it shows:
-1. **Switch to split mode:** take the left and right halves off the main body (both charged). In the GT NX Controller Settings app, tap **Split Mode**. The indicator flashes **yellow**.
+1. **Switch to split mode:** take the left and right halves off the main body (both charged). In the GT NX Controller Settings app, tap **Split Mode**. The controller **re-pairs as two separate controllers**; tap **Connect** for each half, then **Done**. The yellow indicator flashes, then **stays on** once split mode is active. This re-pair is why the left half can briefly keep its old name.
 2. **Play:** hold one half in each hand, or give one half to each player (sideways, Joy-Con style), and follow the in-game controls. Infinix says compatibility varies per game, and the app warns that games without split-mode support can't use it.
-3. **Back to combined:** either restart the controller (it restores the last-used mode; the settings page can only restore Native mode), or put both halves back on the main body (the right half goes on with the side marked "X" facing up), tap **Combined Mode**, then **Connect**.
+3. **Back to combined:** either restart the controller (it restores the last-used mode; the settings page can only restore Native mode), or put both halves back on the main body (the right half goes on with the side marked "X" facing up), tap **Combined Mode**. It reconnects in Native mode; the first time, tap **Connect** and then **Set up my device**.
 4. Fine print: split mode is supported on selected Infinix phones only. On first connection the controller defaults to Mapping mode and then remembers the last-used mode. The demo uses a GT 50 Pro.
 
 ## 2. Detection
