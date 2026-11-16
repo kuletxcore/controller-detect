@@ -1,0 +1,181 @@
+// KX controller logger: injected into the KuletXAI test site for screen recordings.
+// Logs every controller button/axis change (with the GT NX physical control), every key
+// event (real ones and the synthetic ones the site dispatches), navigation, scrolling
+// and focus. A big millisecond clock on screen lines the video up with the log.
+(() => {
+  if (window.__kxLogger) return;
+  window.__kxLogger = true;
+
+  const STD = ['A', 'B', 'X', 'Y', 'LB', 'RB', 'LT', 'RT', 'View/Back', 'Menu/Start', 'L3', 'R3',
+    'D-pad Up', 'D-pad Down', 'D-pad Left', 'D-pad Right', 'Home', 'Extra'];
+  // gtnx-split-profile.json v5: physical control per (half, index), upright
+  const GTNX = {
+    L: { 0: 'd-pad DOWN', 1: 'd-pad LEFT', 2: 'd-pad RIGHT', 3: 'd-pad UP', 4: 'LB or far rail (SL)', 5: 'near rail (SR)',
+      6: 'LT', 8: 'Bluetooth btn', 9: 'green View', 10: 'stick click', 12: 'stick RIGHT', 13: 'stick LEFT', 14: 'stick UP', 15: 'stick DOWN' },
+    R: { 0: 'printed Y', 1: 'printed B', 2: 'printed X', 3: 'printed A', 4: 'near rail (SL)', 5: 'RB or far rail (SR)',
+      7: 'RT', 8: 'Screenshot btn', 9: 'green Menu', 11: 'touchpad CLICK', 12: 'touchpad LEFT edge', 13: 'touchpad RIGHT edge',
+      14: 'touchpad DOWN edge', 15: 'touchpad UP edge' },
+  };
+  const halfOf = (id) => (/Controller-L\b/i.test(id) ? 'L' : /Controller-R\b/i.test(id) ? 'R' : /GT NX|Infinix/i.test(id) ? '?' : null);
+
+  const KEY = 'kxLog';
+  let lines = [];
+  try { lines = JSON.parse(sessionStorage.getItem(KEY) || '[]'); } catch {}
+  const t0 = performance.now();
+  const clock = () => {
+    const d = new Date();
+    return d.toTimeString().slice(0, 8) + '.' + String(d.getMilliseconds()).padStart(3, '0');
+  };
+  let tail = null;
+  let saveTimer = 0;
+  function log(msg, kind = '') {
+    const line = `[${clock()}] ${msg}`;
+    lines.push(line);
+    if (lines.length > 5000) lines.splice(0, lines.length - 5000);
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { try { sessionStorage.setItem(KEY, JSON.stringify(lines)); } catch {} }, 300);
+    if (tail) {
+      const div = document.createElement('div');
+      div.textContent = line;
+      if (kind) div.className = 'kx-' + kind;
+      tail.appendChild(div);
+      while (tail.childElementCount > 9) tail.firstChild.remove();
+    }
+  }
+  log(`PAGE ${location.pathname}${location.search} | UA ${navigator.userAgent}`, 'nav');
+
+  // ---- controller ----
+  const prev = new Map(); // gamepad index -> { buttons:[], axes:[] }
+  const label = (gp) => {
+    const h = halfOf(gp.id);
+    return h ? (h === '?' ? 'GTNX(unsuffixed)' : h) : `pad${gp.index}`;
+  };
+  window.addEventListener('gamepadconnected', (e) => log(`CONNECTED #${e.gamepad.index} ${label(e.gamepad)} id="${e.gamepad.id}" buttons=${e.gamepad.buttons.length} axes=${e.gamepad.axes.length}`, 'conn'));
+  window.addEventListener('gamepaddisconnected', (e) => { prev.delete(e.gamepad.index); log(`DISCONNECTED #${e.gamepad.index} ${label(e.gamepad)}`, 'conn'); });
+
+  function poll() {
+    const pads = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : [];
+    for (const gp of pads) {
+      const was = prev.get(gp.index) || { buttons: [], axes: [] };
+      const h = halfOf(gp.id);
+      gp.buttons.forEach((b, i) => {
+        const down = b.pressed || b.value > 0.5;
+        if (down !== !!was.buttons[i]) {
+          const phys = h && GTNX[h] ? GTNX[h][i] : null;
+          const val = b.value > 0 && b.value < 1 ? ` value=${b.value.toFixed(2)}` : '';
+          log(`${label(gp)} btn ${i} [${STD[i] ?? '?'}]${phys ? ` = ${phys}` : ''} ${down ? 'DOWN' : 'up'}${val}`, down ? 'down' : 'up');
+        }
+        was.buttons[i] = down;
+      });
+      gp.axes.forEach((v, i) => {
+        const zone = v > 0.5 ? 1 : v < -0.5 ? -1 : 0;
+        if (zone !== (was.axes[i] || 0)) log(`${label(gp)} axis ${i} ${zone ? (zone > 0 ? '+' : '-') : 'center'} (${v.toFixed(2)})`, 'axis');
+        was.axes[i] = zone;
+      });
+      prev.set(gp.index, was);
+    }
+    requestAnimationFrame(poll);
+  }
+  requestAnimationFrame(poll);
+
+  // ---- keys: real (from hardware/keyboard) and synthetic (dispatched by the site) ----
+  for (const type of ['keydown', 'keyup']) {
+    window.addEventListener(type, (e) => {
+      if (e.repeat) return;
+      log(`KEY ${type === 'keydown' ? 'DOWN' : 'up'} "${e.key}" ${e.isTrusted ? 'REAL' : 'synthetic (site)'}`, e.isTrusted ? 'key' : 'synth');
+    }, true);
+  }
+
+  // ---- what the site does in response ----
+  const navLog = (how) => log(`NAV ${how} -> ${location.pathname}${location.search}${location.hash}`, 'nav');
+  for (const m of ['pushState', 'replaceState']) {
+    const orig = history[m];
+    history[m] = function (...args) {
+      const r = orig.apply(this, args);
+      navLog(m);
+      return r;
+    };
+  }
+  window.addEventListener('popstate', () => navLog('back/forward'));
+  window.addEventListener('beforeunload', () => log('UNLOAD (full page load)', 'nav'));
+  let scrollTimer = 0;
+  let lastY = 0;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const y = Math.round(scrollY);
+      if (Math.abs(y - lastY) > 8) log(`SCROLL ${y - lastY > 0 ? 'down' : 'up'} to y=${y}`, 'nav');
+      lastY = y;
+    }, 150);
+  }, { passive: true, capture: true });
+  const describe = (el) => {
+    if (!el || el === document.body) return 'body';
+    const txt = (el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    return `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${txt ? ` "${txt}"` : ''}`;
+  };
+  document.addEventListener('focusin', (e) => log(`FOCUS ${describe(e.target)}`, 'nav'), true);
+  window.addEventListener('error', (e) => log(`JS ERROR ${e.message}`, 'err'));
+
+  function exportLog() {
+    log('EXPORT', 'nav');
+    const text = lines.join('\n') + '\n';
+    const blob = new Blob([text], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `kxai-controller-log-${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => { URL.revokeObjectURL(link.href); link.remove(); }, 1000);
+  }
+
+  // ---- overlay ----
+  function mount() {
+    const css = document.createElement('style');
+    css.textContent = `
+#kx-log{position:fixed;left:6px;bottom:6px;z-index:2147483647;width:min(560px,calc(100vw - 12px));font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;color:#e8ecf3;background:rgba(10,12,18,.82);border:1px solid #3a4258;border-radius:8px;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+#kx-log .kx-bar{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px solid #3a4258;pointer-events:auto}
+#kx-log .kx-clock{font-size:16px;font-weight:700;color:#7fe0a8;margin-right:auto}
+#kx-log button{font:inherit;color:#e8ecf3;background:#232a3b;border:1px solid #3a4258;border-radius:5px;padding:2px 7px;cursor:pointer}
+#kx-log .kx-tail{padding:4px 6px;max-height:9.6em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#kx-log .kx-tail div{overflow:hidden;text-overflow:ellipsis}
+#kx-log.kx-min .kx-tail{display:none}
+#kx-export{position:fixed;right:10px;top:10px;z-index:2147483647;font:700 14px/1 system-ui,sans-serif;color:#0b1a12;background:#7fe0a8;border:0;border-radius:999px;padding:12px 16px;box-shadow:0 4px 14px rgba(0,0,0,.45);touch-action:manipulation}
+#kx-export small{display:block;font-weight:500;font-size:10px;margin-top:2px;opacity:.75}
+.kx-down{color:#7fe0a8}.kx-up{color:#8a93a8}.kx-key{color:#ffd479}.kx-synth{color:#f0a0ff}.kx-nav{color:#7cc4ff}.kx-conn{color:#fff;font-weight:700}.kx-axis{color:#c0c8d8}.kx-err{color:#ff7b7b}`;
+    document.head.appendChild(css);
+    const box = document.createElement('div');
+    box.id = 'kx-log';
+    box.innerHTML = `<div class="kx-bar"><span class="kx-clock"></span><button data-a="min">_</button><button data-a="mark">Mark</button><button data-a="save">Save log</button><button data-a="clear">Clear</button></div><div class="kx-tail"></div>`;
+    document.body.appendChild(box);
+    tail = box.querySelector('.kx-tail');
+    for (const l of lines.slice(-9)) { const d = document.createElement('div'); d.textContent = l; tail.appendChild(d); }
+    const clk = box.querySelector('.kx-clock');
+    const tick = () => { clk.textContent = clock(); requestAnimationFrame(tick); };
+    tick();
+    // Buttons use pointerdown so a controller's A/Enter never triggers them
+    box.addEventListener('pointerdown', (e) => {
+      const a = e.target.dataset && e.target.dataset.a;
+      if (!a) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (a === 'min') box.classList.toggle('kx-min');
+      if (a === 'mark') log('---------- MARK ----------', 'conn');
+      if (a === 'clear') { lines = []; tail.textContent = ''; try { sessionStorage.removeItem(KEY); } catch {} log('log cleared', 'nav'); }
+      if (a === 'save') exportLog();
+    }, true);
+    for (const b of box.querySelectorAll('button')) b.tabIndex = -1;
+    // Floating export button, always visible (also when the panel is minimised)
+    const fab = document.createElement('button');
+    fab.id = 'kx-export';
+    fab.tabIndex = -1;
+    fab.innerHTML = 'Export log<small></small>';
+    const count = fab.querySelector('small');
+    setInterval(() => { count.textContent = lines.length + ' lines'; }, 500);
+    fab.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); exportLog(); }, true);
+    fab.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); }, true);
+    document.body.appendChild(fab);
+    log(`logger ready (${Math.round(performance.now() - t0)} ms)`, 'nav');
+  }
+  if (document.body) mount();
+  else document.addEventListener('DOMContentLoaded', mount);
+})();

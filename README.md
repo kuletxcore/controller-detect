@@ -21,3 +21,14 @@ npx wrangler deploy
 
 - [`HANDOFF-gtnx-split-mode.md`](HANDOFF-gtnx-split-mode.md): what each half of the Infinix GT NX sends in split mode, and rules for mixed Xbox/Switch button prompts.
 - [`gtnx-split-profile.json`](gtnx-split-profile.json): the same map as data. The site serves it at `/gtnx-split-profile.json`, and the Joy-Con view reads it.
+
+## kxai-controller (branch `kxai`)
+
+https://kxai-controller.kuletxcore.workers.dev is the KuletXAI test site (`kuletxcore/kuletxai-site`, branch `test`) with a controller logger built in, for screen recordings. A millisecond clock on screen lines the video up with the log. The floating **Export log** button downloads it.
+
+The log records:
+- every controller button and axis change, labelled with the GT NX physical control
+- every key event, real or dispatched by the site
+- navigation, scrolling and focus
+
+Rebuild and redeploy after the test branch changes: `kxai/build.sh` (or `kxai/build.sh <branch>`).
