@@ -113,7 +113,7 @@ The hardware has Xbox labels in a Switch-style split shape. The prompts should s
 
 ## 6. Still unverified
 
-Measured on one unit over 4 labeling runs, on an Infinix GT 50 Pro (Chrome 157; its user agent reports "Android 10; K" because Chrome reduces the UA, so that is not the real OS version), Web Gamepad API with the `standard` mapping. Firmware version unknown.
+Measured on one unit over 4 labeling runs, on an Infinix GT 50 Pro (model X6891, Dimensity 8400 Ultimate, Android 16, build 16.3.0.155SP08; Chrome 157; its user agent reports "Android 10; K" because Chrome reduces the UA, so that is not the real OS version), Web Gamepad API with the `standard` mapping. Firmware version unknown.
 
 - [x] D-pad left/right on `-L`: left=1, right=2, confirmed in 4 runs.
 - [x] Touchpad click on `-R` sends index 11 (R3), confirmed in 3 runs.
