@@ -57,11 +57,11 @@ Match on the **device name**, never on VID/PID.
 | 0 | A | D-pad down | D-pad ↓ | D-pad down |
 | 1 | B | D-pad left | D-pad ← | D-pad left |
 | 2 | X | D-pad right | D-pad → | D-pad right |
-| 4 | LB | LB **and** far rail button | LB | L |
+| 4 | LB | LB **and** far rail button (SL) | LB / SL | L / SL |
 | 6 | LT (analog) | LT | LT | ZL |
 | 9 | Start | Green View button | View | Minus (−) |
 | 8 | Back | Grey Bluetooth button | Bluetooth | Capture (tap only) |
-| 5 | RB | Rail button nearer the metal pin | Rail ● | SL or SR (unverified) |
+| 5 | RB | Rail button nearer the metal pin | SR | SR |
 
 The d-pad is **not** rotated like the stick. It reports as a face-button diamond mirrored left/right: up=Y, down=A, left=B, right=X. This was the same in all 4 labeling runs, so treat it as the real mapping.
 
@@ -73,13 +73,18 @@ The d-pad is **not** rotated like the stick. It reports as a face-button diamond
 | 1 | B | Printed **B** (right) | B | A |
 | 2 | X | Printed **X** (left) | X | Y |
 | 0 | A | Printed **Y** (top) | Y | X |
-| 5 | RB | RB **and** far rail button | RB | R |
+| 5 | RB | RB **and** far rail button (SR) | RB / SR | R / SR |
 | 7 | RT (analog) | RT | RT | ZR |
 | 9 | Start | Green Menu button | Menu | Plus (+) |
 | 8 | Back | Grey Screenshot button | Screenshot | Home |
-| 4 | LB | Rail button nearer the metal pin | Rail ● | SL or SR (unverified) |
-| 11 | R3 | Touchpad pressed in (click) | Pad click | R3 |
-| 12–15 | D-pad | Touchpad noise | (ignore) | none |
+| 4 | LB | Rail button nearer the metal pin | SL | SL |
+| 11 | R3 | Touchpad click (earlier runs) ⚠ | Pad click | R3 |
+| 15 | D-pad Right | Touchpad swipe up ⚠ | Pad ↑ | R-stick up flick |
+| 14 | D-pad Left | Touchpad swipe down ⚠ | Pad ↓ | R-stick down flick |
+| 12 | D-pad Up | Touchpad swipe left ⚠ | Pad ← | R-stick left flick |
+| 13 | D-pad Down | Touchpad swipe right ⚠ | Pad → | R-stick right flick |
+
+⚠ Touchpad: before the user changed the right-half mapping, swipes sent random bursts of 12–15 and a click sent 11. After the change, each swipe sent one clean button, rotated like a sideways Joy-Con, but tap and click both sent 14. One run so far, so keep a fallback: if swipes look noisy (more than one of 12–15 within ~150 ms), ignore 12–15.
 
 ## 5. Mixed prompt rules
 
@@ -92,7 +97,7 @@ The hardware has Xbox labels in a Switch-style split shape. The prompts should s
    - Call the rail buttons SL/SR-style "rail" buttons.
    - Show Minus/Plus/Capture/Home as the role when a game expects Switch semantics.
 4. **Tag every prompt with the half** when both are connected. For example, "L · LB" or "R · A". Both halves use the same index numbers for different things: index 3 is the d-pad up arrow on L and the A button on R.
-5. **Shared indexes:** for `-L` index 4 show **LB**, and for `-R` index 5 show **RB**. Mention the rail button only in a controls help screen.
+5. **Shared indexes:** SL and SR are index 4 and 5 on both halves. Held upright, show **LB**/**RB**. Held sideways (one half per player), show **SL**/**SR**, as on a Joy-Con.
 6. **No analog prompts in split mode.** Hide sensitivity sliders, "hold halfway" hints and right-stick prompts. Show a note that this game needs a right stick if it does. R3 actions can still be prompted as "Pad click" on `-R`.
 7. **Warnings:** don't map hold actions to the left Bluetooth button. Holding it 3 s starts pairing. Treat the right Screenshot button as possibly also taking a phone screenshot.
 
@@ -102,7 +107,8 @@ Measured on one unit over 4 labeling runs, Android 10, Chrome 157, Web Gamepad A
 
 - [x] D-pad left/right on `-L`: left=1, right=2, confirmed in 4 runs.
 - [x] Touchpad click on `-R` sends index 11 (R3), confirmed in 3 runs.
-- [ ] Which rail button is SL and which is SR on each half, by sideways position.
+- [x] SL/SR: the pin is at the end opposite the shoulders, so **SL = index 4 and SR = index 5 on both halves**, same as a real Joy-Con. Worked out from a photo of both rails, not a button test.
+- [ ] Touchpad swipes after the mapping fix (1 run), and whether click sends 11 or 14.
 - [ ] Whether a native Android app sees the same indexes. Expect the same Android keycodes, because Chrome's standard mapping comes from Android's KEYCODE_BUTTON_* events. Not tested in a native app.
 - [ ] Whether the right Screenshot button also takes a phone screenshot in split mode.
 - [ ] Whether newer firmware changes any of this. Re-run the labeling tool after an update.
