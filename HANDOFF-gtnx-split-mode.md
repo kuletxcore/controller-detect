@@ -43,7 +43,7 @@ Match on the **device name**, never on VID/PID.
 ## 3. Hardware facts that shape the profile
 
 1. **No analog input in split mode.** Neither half sends any axis values; all 4 axes stay at 0. The left stick comes through as **digital d-pad buttons** (8-way, no magnitude). In combined mode the stick is analog. Don't show analog-only prompts (e.g. "push gently") in split mode.
-2. **There's no right stick.** The right half has a touchpad. In split mode it sends random bursts of buttons 12–15. **Ignore 12–15 on `-R`.** Pressing the touchpad in does send a clean **index 11 (R3)**, so the touchpad works as one click button.
+2. **There's no right stick.** The right half has a touchpad that works as a **4-zone digital pad** on buttons 12–15 (one clean button per edge), plus a click on **index 11 (R3)**. See the right-half table in section 4. Early runs, before the mapping was changed, gave noisy bursts on 12–15; that no longer happens.
 3. **Each half reports in "sideways" orientation**, like a Switch Joy-Con held sideways. The left stick's directions are rotated 90°: pushing toward the bumpers reports "D-pad Left". The left d-pad reports as face-button indexes 0–3.
 4. **The right half's face buttons don't match their printed letters.** Printed **A sends index 3** (Xbox Y). Printed **Y sends index 0** (Xbox A). B and X match.
 5. **Each bumper shares an index with one rail button.** On L, LB and the rail button farther from the pin both send index 4. On R, RB and the far rail button both send index 5. You can't tell them apart in software.
