@@ -18,6 +18,25 @@
   };
   const halfOf = (id) => (/Controller-L\b/i.test(id) ? 'L' : /Controller-R\b/i.test(id) ? 'R' : /GT NX|Infinix/i.test(id) ? '?' : null);
 
+  // The site's auto Lite mode remembers a slow frame-rate check (kx_lite_auto = 'fps') per origin.
+  // Recording plus logging can trip it, so drop that verdict here, before the site's head script
+  // reads it. Hardware verdicts (gpu/memory/cpu) and a mode the user picked are left alone.
+  let perfNote = '';
+  try {
+    const ls = localStorage;
+    if (ls.getItem('kx_lite_auto') === 'fps' || ls.getItem('kx_slow_checks')) {
+      perfNote = `cleared remembered slow-fps Lite verdict (kx_lite_auto=${ls.getItem('kx_lite_auto')}, kx_slow_checks=${ls.getItem('kx_slow_checks')})`;
+      if (ls.getItem('kx_lite_auto') === 'fps') ls.removeItem('kx_lite_auto');
+      ls.removeItem('kx_slow_checks');
+    }
+  } catch {}
+  const perfState = () => {
+    let m = '?', v = null;
+    try { m = localStorage.getItem('kx_perf') || 'auto'; v = localStorage.getItem('kx_lite_auto'); } catch {}
+    const on = document.documentElement.classList.contains('kx-lite');
+    return `${on ? 'LITE' : 'FULL'} (setting=${m}${v ? `, auto reason=${v}` : ''})`;
+  };
+
   const KEY = 'kxLog';
   let lines = [];
   try { lines = JSON.parse(sessionStorage.getItem(KEY) || '[]'); } catch {}
@@ -43,6 +62,21 @@
     }
   }
   log(`PAGE ${location.pathname}${location.search} | UA ${navigator.userAgent}`, 'nav');
+  if (perfNote) log(perfNote, 'nav');
+
+  // ---- frame rate + graphics mode ----
+  let frames = 0, fps = 0, fpsSince = performance.now();
+  const countFrame = (now) => {
+    frames++;
+    if (now - fpsSince >= 1000) { fps = Math.round(frames * 1000 / (now - fpsSince)); frames = 0; fpsSince = now; }
+  };
+  let lastLite = null;
+  const watchLite = () => {
+    const on = document.documentElement.classList.contains('kx-lite');
+    if (on !== lastLite) { log(`GRAPHICS ${perfState()} | ${fps || '?'} fps`, on ? 'err' : 'nav'); lastLite = on; }
+  };
+  new MutationObserver(watchLite).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  setInterval(() => { if (fps && fps < 30) log(`LOW FPS ${fps}`, 'err'); }, 5000);
 
   // ---- controller ----
   const prev = new Map(); // gamepad index -> { buttons:[], axes:[] }
@@ -53,7 +87,8 @@
   window.addEventListener('gamepadconnected', (e) => log(`CONNECTED #${e.gamepad.index} ${label(e.gamepad)} id="${e.gamepad.id}" buttons=${e.gamepad.buttons.length} axes=${e.gamepad.axes.length}`, 'conn'));
   window.addEventListener('gamepaddisconnected', (e) => { prev.delete(e.gamepad.index); log(`DISCONNECTED #${e.gamepad.index} ${label(e.gamepad)}`, 'conn'); });
 
-  function poll() {
+  function poll(now) {
+    countFrame(now);
     const pads = navigator.getGamepads ? Array.from(navigator.getGamepads()).filter(Boolean) : [];
     for (const gp of pads) {
       const was = prev.get(gp.index) || { buttons: [], axes: [] };
@@ -132,26 +167,28 @@
   function mount() {
     const css = document.createElement('style');
     css.textContent = `
-#kx-log{position:fixed;left:6px;bottom:6px;z-index:2147483647;width:min(560px,calc(100vw - 12px));font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;color:#e8ecf3;background:rgba(10,12,18,.82);border:1px solid #3a4258;border-radius:8px;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+#kx-log{position:fixed;left:6px;bottom:6px;z-index:2147483647;width:min(560px,calc(100vw - 12px));font:11px/1.35 ui-monospace,Menlo,Consolas,monospace;color:#e8ecf3;background:#0a0c12;border:1px solid #3a4258;border-radius:8px;pointer-events:none;contain:layout paint style;will-change:transform;transform:translateZ(0)}
 #kx-log .kx-bar{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px solid #3a4258;pointer-events:auto}
-#kx-log .kx-clock{font-size:16px;font-weight:700;color:#7fe0a8;margin-right:auto}
+#kx-log .kx-clock{font-size:16px;font-weight:700;color:#7fe0a8;margin-right:auto;font-variant-numeric:tabular-nums}#kx-log .kx-fps{color:#8a93a8}
 #kx-log button{font:inherit;color:#e8ecf3;background:#232a3b;border:1px solid #3a4258;border-radius:5px;padding:2px 7px;cursor:pointer}
 #kx-log .kx-tail{padding:4px 6px;max-height:9.6em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 #kx-log .kx-tail div{overflow:hidden;text-overflow:ellipsis}
 #kx-log.kx-min .kx-tail{display:none}
-#kx-export{position:fixed;right:10px;top:10px;z-index:2147483647;font:700 14px/1 system-ui,sans-serif;color:#0b1a12;background:#7fe0a8;border:0;border-radius:999px;padding:12px 16px;box-shadow:0 4px 14px rgba(0,0,0,.45);touch-action:manipulation}
+#kx-export{position:fixed;right:10px;top:10px;z-index:2147483647;font:700 14px/1 system-ui,sans-serif;color:#0b1a12;background:#7fe0a8;border:0;border-radius:999px;padding:12px 16px;touch-action:manipulation;contain:layout paint style;will-change:transform}
 #kx-export small{display:block;font-weight:500;font-size:10px;margin-top:2px;opacity:.75}
 .kx-down{color:#7fe0a8}.kx-up{color:#8a93a8}.kx-key{color:#ffd479}.kx-synth{color:#f0a0ff}.kx-nav{color:#7cc4ff}.kx-conn{color:#fff;font-weight:700}.kx-axis{color:#c0c8d8}.kx-err{color:#ff7b7b}`;
     document.head.appendChild(css);
     const box = document.createElement('div');
     box.id = 'kx-log';
-    box.innerHTML = `<div class="kx-bar"><span class="kx-clock"></span><button data-a="min">_</button><button data-a="mark">Mark</button><button data-a="save">Save log</button><button data-a="clear">Clear</button></div><div class="kx-tail"></div>`;
+    box.innerHTML = `<div class="kx-bar"><span class="kx-clock"></span><span class="kx-fps"></span><button data-a="min">_</button><button data-a="mark">Mark</button><button data-a="save">Save log</button><button data-a="clear">Clear</button></div><div class="kx-tail"></div>`;
     document.body.appendChild(box);
     tail = box.querySelector('.kx-tail');
     for (const l of lines.slice(-9)) { const d = document.createElement('div'); d.textContent = l; tail.appendChild(d); }
     const clk = box.querySelector('.kx-clock');
-    const tick = () => { clk.textContent = clock(); requestAnimationFrame(tick); };
-    tick();
+    const fpsEl = box.querySelector('.kx-fps');
+    // 20 updates a second: enough to line up a 30/60 fps recording, a third of the repaints
+    setInterval(() => { clk.textContent = clock(); fpsEl.textContent = (fps || '?') + ' fps' + (lastLite ? ' LITE' : ''); }, 50);
+    watchLite();
     // Buttons use pointerdown so a controller's A/Enter never triggers them
     box.addEventListener('pointerdown', (e) => {
       const a = e.target.dataset && e.target.dataset.a;
