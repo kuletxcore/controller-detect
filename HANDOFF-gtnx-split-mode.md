@@ -33,7 +33,7 @@ Match on the **device name**, never on VID/PID.
 ## 3. Hardware facts that shape the profile
 
 1. **No analog input in split mode.** Neither half sends any axis values; all 4 axes stay at 0. The left stick comes through as **digital d-pad buttons** (8-way, no magnitude). In combined mode the stick is analog. Don't show analog-only prompts (e.g. "push gently") in split mode.
-2. **There's no right stick.** The right half has a touchpad. In split mode it sends random bursts of buttons 12–15. **Ignore 12–15 on `-R`.**
+2. **There's no right stick.** The right half has a touchpad. In split mode it sends random bursts of buttons 12–15. **Ignore 12–15 on `-R`.** Pressing the touchpad in does send a clean **index 11 (R3)**, so the touchpad works as one click button.
 3. **Each half reports in "sideways" orientation**, like a Switch Joy-Con held sideways. The left stick's directions are rotated 90°: pushing toward the bumpers reports "D-pad Left". The left d-pad reports as face-button indexes 0–3.
 4. **The right half's face buttons don't match their printed letters.** Printed **A sends index 3** (Xbox Y). Printed **Y sends index 0** (Xbox A). B and X match.
 5. **Each bumper shares an index with one rail button.** On L, LB and the rail button farther from the pin both send index 4. On R, RB and the far rail button both send index 5. You can't tell them apart in software.
@@ -55,15 +55,15 @@ Match on the **device name**, never on VID/PID.
 | 10 | L3 | Stick click | L3 | L3 |
 | 3 | Y | D-pad up | D-pad ↑ | D-pad up |
 | 0 | A | D-pad down | D-pad ↓ | D-pad down |
-| 1 | B | D-pad left ⚠ | D-pad ← | D-pad left |
-| 2 | X | D-pad right ⚠ | D-pad → | D-pad right |
+| 1 | B | D-pad left | D-pad ← | D-pad left |
+| 2 | X | D-pad right | D-pad → | D-pad right |
 | 4 | LB | LB **and** far rail button | LB | L |
 | 6 | LT (analog) | LT | LT | ZL |
 | 9 | Start | Green View button | View | Minus (−) |
 | 8 | Back | Grey Bluetooth button | Bluetooth | Capture (tap only) |
 | 5 | RB | Rail button nearer the metal pin | Rail ● | SL or SR (unverified) |
 
-⚠ D-pad left/right may be swapped. The stick follows a clean 90° rotation, but indexes 1 and 2 don't. Confirm with the Joy-Con view before shipping.
+The d-pad is **not** rotated like the stick. It reports as a face-button diamond mirrored left/right: up=Y, down=A, left=B, right=X. This was the same in all 4 labeling runs, so treat it as the real mapping.
 
 ### Right half (`-R`)
 
@@ -78,6 +78,7 @@ Match on the **device name**, never on VID/PID.
 | 9 | Start | Green Menu button | Menu | Plus (+) |
 | 8 | Back | Grey Screenshot button | Screenshot | Home |
 | 4 | LB | Rail button nearer the metal pin | Rail ● | SL or SR (unverified) |
+| 11 | R3 | Touchpad pressed in (click) | Pad click | R3 |
 | 12–15 | D-pad | Touchpad noise | (ignore) | none |
 
 ## 5. Mixed prompt rules
@@ -92,14 +93,15 @@ The hardware has Xbox labels in a Switch-style split shape. The prompts should s
    - Show Minus/Plus/Capture/Home as the role when a game expects Switch semantics.
 4. **Tag every prompt with the half** when both are connected. For example, "L · LB" or "R · A". Both halves use the same index numbers for different things: index 3 is the d-pad up arrow on L and the A button on R.
 5. **Shared indexes:** for `-L` index 4 show **LB**, and for `-R` index 5 show **RB**. Mention the rail button only in a controls help screen.
-6. **No analog prompts in split mode.** Hide sensitivity sliders, "hold halfway" hints and right-stick prompts. Show a note that this game needs a right stick if it does.
+6. **No analog prompts in split mode.** Hide sensitivity sliders, "hold halfway" hints and right-stick prompts. Show a note that this game needs a right stick if it does. R3 actions can still be prompted as "Pad click" on `-R`.
 7. **Warnings:** don't map hold actions to the left Bluetooth button. Holding it 3 s starts pairing. Treat the right Screenshot button as possibly also taking a phone screenshot.
 
 ## 6. Still unverified
 
-Measured on one unit, Android 10, Chrome 157, Web Gamepad API with the `standard` mapping. Firmware version unknown.
+Measured on one unit over 4 labeling runs, Android 10, Chrome 157, Web Gamepad API with the `standard` mapping. Firmware version unknown.
 
-- [ ] D-pad left/right on `-L` (indexes 1 and 2), see the ⚠ above.
+- [x] D-pad left/right on `-L`: left=1, right=2, confirmed in 4 runs.
+- [x] Touchpad click on `-R` sends index 11 (R3), confirmed in 3 runs.
 - [ ] Which rail button is SL and which is SR on each half, by sideways position.
 - [ ] Whether a native Android app sees the same indexes. Expect the same Android keycodes, because Chrome's standard mapping comes from Android's KEYCODE_BUTTON_* events. Not tested in a native app.
 - [ ] Whether the right Screenshot button also takes a phone screenshot in split mode.

@@ -1,8 +1,9 @@
 {
   "profile": "infinix-gt-nx-split",
-  "version": 1,
+  "version": 2,
   "measured": {
-    "date": "2026-11-15",
+    "date": "2026-11-16",
+    "runs": 4,
     "platform": "Android 10, Chrome 157, Web Gamepad API (mapping: standard)",
     "units": 1,
     "tool": "https://controller.kuletxcore.workers.dev (Button labeling)"
@@ -40,8 +41,8 @@
         { "id": "stick_click", "index": 10, "type": "button", "glyph": "L3",        "upright": "stick click", "sideways": "stick click", "switchDual": "L3 (left stick press)" },
         { "id": "dpad_up",     "index": 3,  "type": "button", "glyph": "D-pad ↑",   "upright": "d-pad up",    "sideways": "d-pad left",  "switchDual": "D-pad up" },
         { "id": "dpad_down",   "index": 0,  "type": "button", "glyph": "D-pad ↓",   "upright": "d-pad down",  "sideways": "d-pad right", "switchDual": "D-pad down" },
-        { "id": "dpad_left",   "index": 1,  "type": "button", "glyph": "D-pad ←",   "upright": "d-pad left",  "sideways": "d-pad down",  "switchDual": "D-pad left",  "verify": "Left/right may be swapped: indexes 1 and 2 do not follow the same 90-degree rotation as the stick. Re-check with the Joy-Con view." },
-        { "id": "dpad_right",  "index": 2,  "type": "button", "glyph": "D-pad →",   "upright": "d-pad right", "sideways": "d-pad up",    "switchDual": "D-pad right", "verify": "See dpad_left." },
+        { "id": "dpad_left",   "index": 1,  "type": "button", "glyph": "D-pad ←",   "upright": "d-pad left",  "sideways": "d-pad down",  "switchDual": "D-pad left",  "note": "Confirmed in 4 labeling runs. The d-pad is NOT rotated like the stick: it reports as a face diamond mirrored left/right (left sends B, right sends X)." },
+        { "id": "dpad_right",  "index": 2,  "type": "button", "glyph": "D-pad →",   "upright": "d-pad right", "sideways": "d-pad up",    "switchDual": "D-pad right", "note": "Confirmed in 4 labeling runs. See dpad_left." },
         { "id": "lb",          "index": 4,  "type": "button", "glyph": "LB",        "upright": "left bumper", "sideways": "rail side",   "switchDual": "L",  "sharesIndexWith": "rail_far" },
         { "id": "lt",          "index": 6,  "type": "button", "glyph": "LT",        "upright": "left trigger", "sideways": "rail side",  "switchDual": "ZL", "analog": true },
         { "id": "view",        "index": 9,  "type": "button", "glyph": "View",      "upright": "green button", "sideways": "green button", "switchDual": "Minus (−)" },
@@ -62,11 +63,12 @@
         { "id": "rt",          "index": 7,  "type": "button", "glyph": "RT",         "upright": "right trigger", "sideways": "rail side", "switchDual": "ZR", "analog": true },
         { "id": "menu",        "index": 9,  "type": "button", "glyph": "Menu",       "upright": "green button", "sideways": "green button", "switchDual": "Plus (+)" },
         { "id": "screenshot",  "index": 8,  "type": "button", "glyph": "Screenshot", "upright": "grey button", "sideways": "grey button", "switchDual": "Home", "warning": "May also trigger a phone screenshot (manual shortcut). Untested in split mode." },
+        { "id": "touchpad_click", "index": 11, "type": "button", "glyph": "Pad click", "upright": "press the touchpad in", "sideways": "press the touchpad in", "switchDual": "R3 (right stick press)", "note": "Confirmed in 3 labeling runs. A click also emits touchpad noise on 12-15 just before it, so read only index 11." },
         { "id": "rail_near",   "index": 4,  "type": "button", "glyph": "Rail ●",     "upright": "rail button nearer the metal pin", "sideways": "rail button nearer the metal pin", "switchDual": "SL or SR (unverified which)", "verify": "Which rail button is SL and which is SR is not confirmed." },
         { "id": "rail_far",    "index": 5,  "type": "button", "glyph": "Rail ○",     "upright": "rail button farther from the pin", "sideways": "rail button farther from the pin", "switchDual": "SL or SR (unverified which)", "verify": "Which rail button is SL and which is SR is not confirmed.", "sharesIndexWith": "rb" }
       ],
       "ignore": [
-        { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "reason": "Swipes, taps and clicks emit random bursts of d-pad buttons in no stable pattern. Not usable as a right stick or d-pad. Ignore these indexes on -R." }
+        { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "reason": "Swipes, taps and clicks emit random bursts of d-pad buttons in no stable pattern. Not usable as a right stick or d-pad. Ignore these indexes on -R. Index 11 (touchpad click) is separate and usable." }
       ]
     }
   }
