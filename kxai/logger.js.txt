@@ -84,8 +84,8 @@
     const h = halfOf(gp.id);
     return h ? (h === '?' ? 'GTNX(unsuffixed)' : h) : `pad${gp.index}`;
   };
-  window.addEventListener('gamepadconnected', (e) => log(`CONNECTED #${e.gamepad.index} ${label(e.gamepad)} id="${e.gamepad.id}" buttons=${e.gamepad.buttons.length} axes=${e.gamepad.axes.length}`, 'conn'));
-  window.addEventListener('gamepaddisconnected', (e) => { prev.delete(e.gamepad.index); log(`DISCONNECTED #${e.gamepad.index} ${label(e.gamepad)}`, 'conn'); });
+  window.addEventListener('gamepadconnected', (e) => e.gamepad && log(`CONNECTED #${e.gamepad.index} ${label(e.gamepad)} id="${e.gamepad.id}" buttons=${e.gamepad.buttons.length} axes=${e.gamepad.axes.length}`, 'conn'));
+  window.addEventListener('gamepaddisconnected', (e) => { if (!e.gamepad) return; prev.delete(e.gamepad.index); log(`DISCONNECTED #${e.gamepad.index} ${label(e.gamepad)}`, 'conn'); });
 
   function poll(now) {
     countFrame(now);
