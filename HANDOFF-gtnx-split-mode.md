@@ -96,6 +96,60 @@ The d-pad is **not** rotated like the stick. It reports as a face-button diamond
 
 The touchpad is a 4-zone digital pad: touching or swiping toward an edge fires that zone (same sideways rotation as the left stick). Confirmed in 3 runs. A plain tap in the middle fires whichever zone is nearest, so it isn't a separate input. A hard press sends 11, but the zone under the finger (usually 13) fires 30–100 ms first: when 11 goes down, cancel any 12–15 press that started in the last 150 ms.
 
+### Full index lookup (0–17)
+
+Every standard-gamepad index on each half, in index order. Use it as the lookup table: `(half, index)` → what to draw and what it does. The same data is in the JSON under `halves.<L|R>.byIndex`, and each control has a `soloSideways` field.
+
+- **Android input** is the keycode or axis Chrome reads for that index, so a native app should see the same thing (not tested natively).
+- **Solo sideways role** is the role when one player holds one half sideways, like a single Joy-Con. It's derived from the measured rotation: the left half turns 90° counter-clockwise and the right half 90° clockwise. Face roles follow the Nintendo diamond by position: right = A, bottom = B, left = Y, top = X.
+- A **/** means two physical controls send the same index.
+
+#### Left half (`-L`)
+
+| Index | Standard name | Android input | Physical control (upright) | Prompt glyph | Switch role (both halves) | Solo sideways role |
+|---|---|---|---|---|---|---|
+| 0 | A | `KEYCODE_BUTTON_A` | d-pad down | D-pad ↓ | D-pad down | A (right position) |
+| 1 | B | `KEYCODE_BUTTON_B` | d-pad left | D-pad ← | D-pad left | B (bottom position) |
+| 2 | X | `KEYCODE_BUTTON_X` | d-pad right | D-pad → | D-pad right | X (top position) |
+| 3 | Y | `KEYCODE_BUTTON_Y` | d-pad up | D-pad ↑ | D-pad up | Y (left position) |
+| 4 | LB | `KEYCODE_BUTTON_L1` | left bumper **/** rail button farther from the pin | LB **/** SL | L **/** SL | SL (same index as LB) **/** SL (left shoulder) |
+| 5 | RB | `KEYCODE_BUTTON_R1` | rail button nearer the metal pin | SR | SR | SR (right shoulder) |
+| 6 | LT | `AXIS_LTRIGGER` | left trigger | LT | ZL | (hard to reach sideways) |
+| 7 | RT | `AXIS_RTRIGGER` | — never fires | — | — | — |
+| 8 | Back/View | `KEYCODE_BUTTON_SELECT` | grey Bluetooth button | Bluetooth | Capture | Capture (tap only) |
+| 9 | Start/Menu | `KEYCODE_BUTTON_START` | green button | View | Minus (−) | Minus (menu) |
+| 10 | L3 | `KEYCODE_BUTTON_THUMBL` | stick click | L3 | L3 (left stick press) | Stick press |
+| 11 | R3 | `KEYCODE_BUTTON_THUMBR` | — never fires | — | — | — |
+| 12 | D-pad Up | `KEYCODE_DPAD_UP` | stick right | L-stick → | Left stick right | Stick up |
+| 13 | D-pad Down | `KEYCODE_DPAD_DOWN` | stick left | L-stick ← | Left stick left | Stick down |
+| 14 | D-pad Left | `KEYCODE_DPAD_LEFT` | stick up | L-stick ↑ | Left stick up | Stick left |
+| 15 | D-pad Right | `KEYCODE_DPAD_RIGHT` | stick down | L-stick ↓ | Left stick down | Stick right |
+| 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — never fires | — | — | — |
+| 17 | (extra) | `none` | — never fires | — | — | — |
+
+#### Right half (`-R`)
+
+| Index | Standard name | Android input | Physical control (upright) | Prompt glyph | Switch role (both halves) | Solo sideways role |
+|---|---|---|---|---|---|---|
+| 0 | A | `KEYCODE_BUTTON_A` | printed Y (top) | Y | X (top position) | A (right position) |
+| 1 | B | `KEYCODE_BUTTON_B` | printed B (right) | B | A (right position) | B (bottom position) |
+| 2 | X | `KEYCODE_BUTTON_X` | printed X (left) | X | Y (left position) | X (top position) |
+| 3 | Y | `KEYCODE_BUTTON_Y` | printed A (bottom) | A | B (bottom position) | Y (left position) |
+| 4 | LB | `KEYCODE_BUTTON_L1` | rail button nearer the metal pin | SL | SL | SL (left shoulder) |
+| 5 | RB | `KEYCODE_BUTTON_R1` | right bumper **/** rail button farther from the pin | RB **/** SR | R **/** SR | SR (same index as RB) **/** SR (right shoulder) |
+| 6 | LT | `AXIS_LTRIGGER` | — never fires | — | — | — |
+| 7 | RT | `AXIS_RTRIGGER` | right trigger | RT | ZR | (hard to reach sideways) |
+| 8 | Back/View | `KEYCODE_BUTTON_SELECT` | grey button | Screenshot | Home | Home |
+| 9 | Start/Menu | `KEYCODE_BUTTON_START` | green button | Menu | Plus (+) | Plus (menu) |
+| 10 | L3 | `KEYCODE_BUTTON_THUMBL` | — never fires | — | — | — |
+| 11 | R3 | `KEYCODE_BUTTON_THUMBR` | press the touchpad in | Pad click | R3 (right stick press) | Stick press |
+| 12 | D-pad Up | `KEYCODE_DPAD_UP` | swipe touchpad left | Pad ← | Right stick left (flick) | Stick up |
+| 13 | D-pad Down | `KEYCODE_DPAD_DOWN` | swipe touchpad right | Pad → | Right stick right (flick) | Stick down |
+| 14 | D-pad Left | `KEYCODE_DPAD_LEFT` | swipe touchpad down | Pad ↓ | Right stick down (flick) | Stick left |
+| 15 | D-pad Right | `KEYCODE_DPAD_RIGHT` | swipe touchpad up | Pad ↑ | Right stick up (flick) | Stick right |
+| 16 | Home/Guide | `KEYCODE_BUTTON_MODE` | — never fires | — | — | — |
+| 17 | (extra) | `none` | — never fires | — | — | — |
+
 ## 5. Mixed prompt rules
 
 The hardware has Xbox labels in a Switch-style split shape. The prompts should show both.

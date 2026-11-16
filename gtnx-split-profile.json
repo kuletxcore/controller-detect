@@ -1,6 +1,6 @@
 {
   "profile": "infinix-gt-nx-split",
-  "version": 4,
+  "version": 5,
   "measured": {
     "date": "2026-11-16",
     "runs": 4,
@@ -34,46 +34,88 @@
       "joycon": "left",
       "analogAxes": false,
       "controls": [
-        { "id": "stick_up",    "index": 14, "type": "button", "glyph": "L-stick ↑", "upright": "stick up",    "sideways": "stick left",  "switchDual": "Left stick up" },
-        { "id": "stick_down",  "index": 15, "type": "button", "glyph": "L-stick ↓", "upright": "stick down",  "sideways": "stick right", "switchDual": "Left stick down" },
-        { "id": "stick_left",  "index": 13, "type": "button", "glyph": "L-stick ←", "upright": "stick left",  "sideways": "stick down",  "switchDual": "Left stick left" },
-        { "id": "stick_right", "index": 12, "type": "button", "glyph": "L-stick →", "upright": "stick right", "sideways": "stick up",    "switchDual": "Left stick right" },
-        { "id": "stick_click", "index": 10, "type": "button", "glyph": "L3",        "upright": "stick click", "sideways": "stick click", "switchDual": "L3 (left stick press)" },
-        { "id": "dpad_up",     "index": 3,  "type": "button", "glyph": "D-pad ↑",   "upright": "d-pad up",    "sideways": "d-pad left",  "switchDual": "D-pad up" },
-        { "id": "dpad_down",   "index": 0,  "type": "button", "glyph": "D-pad ↓",   "upright": "d-pad down",  "sideways": "d-pad right", "switchDual": "D-pad down" },
-        { "id": "dpad_left",   "index": 1,  "type": "button", "glyph": "D-pad ←",   "upright": "d-pad left",  "sideways": "d-pad down",  "switchDual": "D-pad left",  "note": "Confirmed in 4 labeling runs. The d-pad is NOT rotated like the stick: it reports as a face diamond mirrored left/right (left sends B, right sends X)." },
-        { "id": "dpad_right",  "index": 2,  "type": "button", "glyph": "D-pad →",   "upright": "d-pad right", "sideways": "d-pad up",    "switchDual": "D-pad right", "note": "Confirmed in 4 labeling runs. See dpad_left." },
-        { "id": "lb",          "index": 4,  "type": "button", "glyph": "LB",        "upright": "left bumper", "sideways": "rail side",   "switchDual": "L",  "sharesIndexWith": "rail_far" },
-        { "id": "lt",          "index": 6,  "type": "button", "glyph": "LT",        "upright": "left trigger", "sideways": "rail side",  "switchDual": "ZL", "analog": true },
-        { "id": "view",        "index": 9,  "type": "button", "glyph": "View",      "upright": "green button", "sideways": "green button", "switchDual": "Minus (−)" },
-        { "id": "bluetooth",   "index": 8,  "type": "button", "glyph": "Bluetooth", "upright": "grey Bluetooth button", "sideways": "grey Bluetooth button", "switchDual": "Capture", "warning": "Holding 3 s enters phone pairing; View + Bluetooth 5 s re-pairs the halves. Only bind to tap actions." },
-        { "id": "rail_near",   "index": 5,  "type": "button", "glyph": "SR",        "upright": "rail button nearer the metal pin", "sideways": "right rail button", "switchDual": "SR", "note": "Pin end is opposite the shoulders, so held sideways this button is on the right." },
-        { "id": "rail_far",    "index": 4,  "type": "button", "glyph": "SL",        "upright": "rail button farther from the pin", "sideways": "left rail button", "switchDual": "SL", "sharesIndexWith": "lb" }
-      ]
+        { "id": "stick_up", "index": 14, "type": "button", "glyph": "L-stick ↑", "upright": "stick up", "sideways": "stick left", "switchDual": "Left stick up", "soloSideways": "Stick left" },
+        { "id": "stick_down", "index": 15, "type": "button", "glyph": "L-stick ↓", "upright": "stick down", "sideways": "stick right", "switchDual": "Left stick down", "soloSideways": "Stick right" },
+        { "id": "stick_left", "index": 13, "type": "button", "glyph": "L-stick ←", "upright": "stick left", "sideways": "stick down", "switchDual": "Left stick left", "soloSideways": "Stick down" },
+        { "id": "stick_right", "index": 12, "type": "button", "glyph": "L-stick →", "upright": "stick right", "sideways": "stick up", "switchDual": "Left stick right", "soloSideways": "Stick up" },
+        { "id": "stick_click", "index": 10, "type": "button", "glyph": "L3", "upright": "stick click", "sideways": "stick click", "switchDual": "L3 (left stick press)", "soloSideways": "Stick press" },
+        { "id": "dpad_up", "index": 3, "type": "button", "glyph": "D-pad ↑", "upright": "d-pad up", "sideways": "d-pad left", "switchDual": "D-pad up", "soloSideways": "Y (left position)" },
+        { "id": "dpad_down", "index": 0, "type": "button", "glyph": "D-pad ↓", "upright": "d-pad down", "sideways": "d-pad right", "switchDual": "D-pad down", "soloSideways": "A (right position)" },
+        { "id": "dpad_left", "index": 1, "type": "button", "glyph": "D-pad ←", "upright": "d-pad left", "sideways": "d-pad down", "switchDual": "D-pad left", "note": "Confirmed in 4 labeling runs. The d-pad is NOT rotated like the stick: it reports as a face diamond mirrored left/right (left sends B, right sends X).", "soloSideways": "B (bottom position)" },
+        { "id": "dpad_right", "index": 2, "type": "button", "glyph": "D-pad →", "upright": "d-pad right", "sideways": "d-pad up", "switchDual": "D-pad right", "note": "Confirmed in 4 labeling runs. See dpad_left.", "soloSideways": "X (top position)" },
+        { "id": "lb", "index": 4, "type": "button", "glyph": "LB", "upright": "left bumper", "sideways": "rail side", "switchDual": "L", "sharesIndexWith": "rail_far", "soloSideways": "SL (same index as LB)" },
+        { "id": "lt", "index": 6, "type": "button", "glyph": "LT", "upright": "left trigger", "sideways": "rail side", "switchDual": "ZL", "analog": true, "soloSideways": "(hard to reach sideways)" },
+        { "id": "view", "index": 9, "type": "button", "glyph": "View", "upright": "green button", "sideways": "green button", "switchDual": "Minus (−)", "soloSideways": "Minus (menu)" },
+        { "id": "bluetooth", "index": 8, "type": "button", "glyph": "Bluetooth", "upright": "grey Bluetooth button", "sideways": "grey Bluetooth button", "switchDual": "Capture", "warning": "Holding 3 s enters phone pairing; View + Bluetooth 5 s re-pairs the halves. Only bind to tap actions.", "soloSideways": "Capture (tap only)" },
+        { "id": "rail_near", "index": 5, "type": "button", "glyph": "SR", "upright": "rail button nearer the metal pin", "sideways": "right rail button", "switchDual": "SR", "note": "Pin end is opposite the shoulders, so held sideways this button is on the right.", "soloSideways": "SR (right shoulder)" },
+        { "id": "rail_far", "index": 4, "type": "button", "glyph": "SL", "upright": "rail button farther from the pin", "sideways": "left rail button", "switchDual": "SL", "sharesIndexWith": "lb", "soloSideways": "SL (left shoulder)" }
+      ],
+      "byIndex": {
+        "0": { "standard": "A", "android": "KEYCODE_BUTTON_A", "controls": [ "dpad_down" ] },
+        "1": { "standard": "B", "android": "KEYCODE_BUTTON_B", "controls": [ "dpad_left" ] },
+        "2": { "standard": "X", "android": "KEYCODE_BUTTON_X", "controls": [ "dpad_right" ] },
+        "3": { "standard": "Y", "android": "KEYCODE_BUTTON_Y", "controls": [ "dpad_up" ] },
+        "4": { "standard": "LB", "android": "KEYCODE_BUTTON_L1", "controls": [ "lb", "rail_far" ] },
+        "5": { "standard": "RB", "android": "KEYCODE_BUTTON_R1", "controls": [ "rail_near" ] },
+        "6": { "standard": "LT", "android": "AXIS_LTRIGGER", "controls": [ "lt" ] },
+        "7": { "standard": "RT", "android": "AXIS_RTRIGGER", "controls": [], "note": "Never fires on this half." },
+        "8": { "standard": "Back/View", "android": "KEYCODE_BUTTON_SELECT", "controls": [ "bluetooth" ] },
+        "9": { "standard": "Start/Menu", "android": "KEYCODE_BUTTON_START", "controls": [ "view" ] },
+        "10": { "standard": "L3", "android": "KEYCODE_BUTTON_THUMBL", "controls": [ "stick_click" ] },
+        "11": { "standard": "R3", "android": "KEYCODE_BUTTON_THUMBR", "controls": [], "note": "Never fires on this half." },
+        "12": { "standard": "D-pad Up", "android": "KEYCODE_DPAD_UP", "controls": [ "stick_right" ] },
+        "13": { "standard": "D-pad Down", "android": "KEYCODE_DPAD_DOWN", "controls": [ "stick_left" ] },
+        "14": { "standard": "D-pad Left", "android": "KEYCODE_DPAD_LEFT", "controls": [ "stick_up" ] },
+        "15": { "standard": "D-pad Right", "android": "KEYCODE_DPAD_RIGHT", "controls": [ "stick_down" ] },
+        "16": { "standard": "Home/Guide", "android": "KEYCODE_BUTTON_MODE", "controls": [], "note": "Never fires on this half." },
+        "17": { "standard": "(extra)", "android": "none", "controls": [], "note": "Never fires on this half." }
+      }
     },
     "R": {
       "joycon": "right",
       "analogAxes": false,
       "controls": [
-        { "id": "face_a",      "index": 3,  "type": "button", "glyph": "A",          "upright": "printed A (bottom)", "sideways": "printed A", "switchDual": "B (bottom position)", "note": "Sends standard index 3 (Y). A and Y are swapped versus Xbox." },
-        { "id": "face_b",      "index": 1,  "type": "button", "glyph": "B",          "upright": "printed B (right)",  "sideways": "printed B", "switchDual": "A (right position)" },
-        { "id": "face_x",      "index": 2,  "type": "button", "glyph": "X",          "upright": "printed X (left)",   "sideways": "printed X", "switchDual": "Y (left position)" },
-        { "id": "face_y",      "index": 0,  "type": "button", "glyph": "Y",          "upright": "printed Y (top)",    "sideways": "printed Y", "switchDual": "X (top position)", "note": "Sends standard index 0 (A). A and Y are swapped versus Xbox." },
-        { "id": "rb",          "index": 5,  "type": "button", "glyph": "RB",         "upright": "right bumper",  "sideways": "rail side", "switchDual": "R",  "sharesIndexWith": "rail_far" },
-        { "id": "rt",          "index": 7,  "type": "button", "glyph": "RT",         "upright": "right trigger", "sideways": "rail side", "switchDual": "ZR", "analog": true },
-        { "id": "menu",        "index": 9,  "type": "button", "glyph": "Menu",       "upright": "green button", "sideways": "green button", "switchDual": "Plus (+)" },
-        { "id": "screenshot",  "index": 8,  "type": "button", "glyph": "Screenshot", "upright": "grey button", "sideways": "grey button", "switchDual": "Home", "warning": "May also trigger a phone screenshot (manual shortcut). Untested in split mode." },
-        { "id": "touchpad_click", "index": 11, "type": "button", "glyph": "Pad click", "upright": "press the touchpad in", "sideways": "press the touchpad in", "switchDual": "R3 (right stick press)", "note": "Confirmed: 11 on every hard press (8+ presses over 2 sessions). The edge zone under the finger fires ~30-100 ms first (usually 13); on 11 down, cancel any 12-15 press that began in the last 150 ms." },
-        { "id": "pad_swipe_up",    "index": 15, "type": "button", "glyph": "Pad ↑", "upright": "swipe touchpad up",    "sideways": "swipe right", "switchDual": "Right stick up (flick)",    "note": "Confirmed in 3 runs: touch or swipe toward the up edge. Works as a digital d-pad zone." },
-        { "id": "pad_swipe_down",  "index": 14, "type": "button", "glyph": "Pad ↓", "upright": "swipe touchpad down",  "sideways": "swipe left",  "switchDual": "Right stick down (flick)",  "note": "Confirmed in 3 runs: touch or swipe toward the down edge. Works as a digital d-pad zone." },
-        { "id": "pad_swipe_left",  "index": 12, "type": "button", "glyph": "Pad ←", "upright": "swipe touchpad left",  "sideways": "swipe up",    "switchDual": "Right stick left (flick)",  "note": "Confirmed in 3 runs: touch or swipe toward the left edge. Works as a digital d-pad zone." },
-        { "id": "pad_swipe_right", "index": 13, "type": "button", "glyph": "Pad →", "upright": "swipe touchpad right", "sideways": "swipe down",  "switchDual": "Right stick right (flick)", "note": "Confirmed in 3 runs: touch or swipe toward the right edge. Works as a digital d-pad zone." },
-        { "id": "rail_near",   "index": 4,  "type": "button", "glyph": "SL",         "upright": "rail button nearer the metal pin", "sideways": "left rail button", "switchDual": "SL", "note": "Pin end is opposite the shoulders, so held sideways this button is on the left." },
-        { "id": "rail_far",    "index": 5,  "type": "button", "glyph": "SR",         "upright": "rail button farther from the pin", "sideways": "right rail button", "switchDual": "SR", "sharesIndexWith": "rb" }
+        { "id": "face_a", "index": 3, "type": "button", "glyph": "A", "upright": "printed A (bottom)", "sideways": "printed A", "switchDual": "B (bottom position)", "note": "Sends standard index 3 (Y). A and Y are swapped versus Xbox.", "soloSideways": "Y (left position)" },
+        { "id": "face_b", "index": 1, "type": "button", "glyph": "B", "upright": "printed B (right)", "sideways": "printed B", "switchDual": "A (right position)", "soloSideways": "B (bottom position)" },
+        { "id": "face_x", "index": 2, "type": "button", "glyph": "X", "upright": "printed X (left)", "sideways": "printed X", "switchDual": "Y (left position)", "soloSideways": "X (top position)" },
+        { "id": "face_y", "index": 0, "type": "button", "glyph": "Y", "upright": "printed Y (top)", "sideways": "printed Y", "switchDual": "X (top position)", "note": "Sends standard index 0 (A). A and Y are swapped versus Xbox.", "soloSideways": "A (right position)" },
+        { "id": "rb", "index": 5, "type": "button", "glyph": "RB", "upright": "right bumper", "sideways": "rail side", "switchDual": "R", "sharesIndexWith": "rail_far", "soloSideways": "SR (same index as RB)" },
+        { "id": "rt", "index": 7, "type": "button", "glyph": "RT", "upright": "right trigger", "sideways": "rail side", "switchDual": "ZR", "analog": true, "soloSideways": "(hard to reach sideways)" },
+        { "id": "menu", "index": 9, "type": "button", "glyph": "Menu", "upright": "green button", "sideways": "green button", "switchDual": "Plus (+)", "soloSideways": "Plus (menu)" },
+        { "id": "screenshot", "index": 8, "type": "button", "glyph": "Screenshot", "upright": "grey button", "sideways": "grey button", "switchDual": "Home", "warning": "May also trigger a phone screenshot (manual shortcut). Untested in split mode.", "soloSideways": "Home" },
+        { "id": "touchpad_click", "index": 11, "type": "button", "glyph": "Pad click", "upright": "press the touchpad in", "sideways": "press the touchpad in", "switchDual": "R3 (right stick press)", "note": "Confirmed: 11 on every hard press (8+ presses over 2 sessions). The edge zone under the finger fires ~30-100 ms first (usually 13); on 11 down, cancel any 12-15 press that began in the last 150 ms.", "soloSideways": "Stick press" },
+        { "id": "pad_swipe_up", "index": 15, "type": "button", "glyph": "Pad ↑", "upright": "swipe touchpad up", "sideways": "swipe right", "switchDual": "Right stick up (flick)", "note": "Confirmed in 3 runs: touch or swipe toward the up edge. Works as a digital d-pad zone.", "soloSideways": "Stick right" },
+        { "id": "pad_swipe_down", "index": 14, "type": "button", "glyph": "Pad ↓", "upright": "swipe touchpad down", "sideways": "swipe left", "switchDual": "Right stick down (flick)", "note": "Confirmed in 3 runs: touch or swipe toward the down edge. Works as a digital d-pad zone.", "soloSideways": "Stick left" },
+        { "id": "pad_swipe_left", "index": 12, "type": "button", "glyph": "Pad ←", "upright": "swipe touchpad left", "sideways": "swipe up", "switchDual": "Right stick left (flick)", "note": "Confirmed in 3 runs: touch or swipe toward the left edge. Works as a digital d-pad zone.", "soloSideways": "Stick up" },
+        { "id": "pad_swipe_right", "index": 13, "type": "button", "glyph": "Pad →", "upright": "swipe touchpad right", "sideways": "swipe down", "switchDual": "Right stick right (flick)", "note": "Confirmed in 3 runs: touch or swipe toward the right edge. Works as a digital d-pad zone.", "soloSideways": "Stick down" },
+        { "id": "rail_near", "index": 4, "type": "button", "glyph": "SL", "upright": "rail button nearer the metal pin", "sideways": "left rail button", "switchDual": "SL", "note": "Pin end is opposite the shoulders, so held sideways this button is on the left.", "soloSideways": "SL (left shoulder)" },
+        { "id": "rail_far", "index": 5, "type": "button", "glyph": "SR", "upright": "rail button farther from the pin", "sideways": "right rail button", "switchDual": "SR", "sharesIndexWith": "rb", "soloSideways": "SR (right shoulder)" }
       ],
       "history": [
-        { "indexes": [12, 13, 14, 15], "type": "button", "source": "touchpad", "note": "Superseded. Early runs, before the right-half mapping was changed, gave noisy bursts of 12-15 per swipe. Since then each edge sends one clean button (see pad_swipe_*). Do not ignore these indexes." }
-      ]
+        { "indexes": [ 12, 13, 14, 15 ], "type": "button", "source": "touchpad", "note": "Superseded. Early runs, before the right-half mapping was changed, gave noisy bursts of 12-15 per swipe. Since then each edge sends one clean button (see pad_swipe_*). Do not ignore these indexes." }
+      ],
+      "byIndex": {
+        "0": { "standard": "A", "android": "KEYCODE_BUTTON_A", "controls": [ "face_y" ] },
+        "1": { "standard": "B", "android": "KEYCODE_BUTTON_B", "controls": [ "face_b" ] },
+        "2": { "standard": "X", "android": "KEYCODE_BUTTON_X", "controls": [ "face_x" ] },
+        "3": { "standard": "Y", "android": "KEYCODE_BUTTON_Y", "controls": [ "face_a" ] },
+        "4": { "standard": "LB", "android": "KEYCODE_BUTTON_L1", "controls": [ "rail_near" ] },
+        "5": { "standard": "RB", "android": "KEYCODE_BUTTON_R1", "controls": [ "rb", "rail_far" ] },
+        "6": { "standard": "LT", "android": "AXIS_LTRIGGER", "controls": [], "note": "Never fires on this half." },
+        "7": { "standard": "RT", "android": "AXIS_RTRIGGER", "controls": [ "rt" ] },
+        "8": { "standard": "Back/View", "android": "KEYCODE_BUTTON_SELECT", "controls": [ "screenshot" ] },
+        "9": { "standard": "Start/Menu", "android": "KEYCODE_BUTTON_START", "controls": [ "menu" ] },
+        "10": { "standard": "L3", "android": "KEYCODE_BUTTON_THUMBL", "controls": [], "note": "Never fires on this half." },
+        "11": { "standard": "R3", "android": "KEYCODE_BUTTON_THUMBR", "controls": [ "touchpad_click" ] },
+        "12": { "standard": "D-pad Up", "android": "KEYCODE_DPAD_UP", "controls": [ "pad_swipe_left" ] },
+        "13": { "standard": "D-pad Down", "android": "KEYCODE_DPAD_DOWN", "controls": [ "pad_swipe_right" ] },
+        "14": { "standard": "D-pad Left", "android": "KEYCODE_DPAD_LEFT", "controls": [ "pad_swipe_down" ] },
+        "15": { "standard": "D-pad Right", "android": "KEYCODE_DPAD_RIGHT", "controls": [ "pad_swipe_up" ] },
+        "16": { "standard": "Home/Guide", "android": "KEYCODE_BUTTON_MODE", "controls": [], "note": "Never fires on this half." },
+        "17": { "standard": "(extra)", "android": "none", "controls": [], "note": "Never fires on this half." }
+      }
     }
-  }
+  },
+  "soloSidewaysNote": "soloSideways = role when one half is held sideways by one player (single Joy-Con style). Derived from the measured rotation: left half turns 90 deg counter-clockwise, right half 90 deg clockwise; face roles use the Nintendo diamond by position (right=A, bottom=B, left=Y, top=X).",
+  "androidNote": "android = the Android KeyEvent keycode / MotionEvent axis Chrome reads for that standard index. Expected to match a native app; not tested natively."
 }
