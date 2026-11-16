@@ -31,7 +31,8 @@ export default {
       });
     }
     // A file path that isn't a built asset: serve it from the repo's public/ folder
-    if (ext(path) && ext(path) !== 'html') {
+    // (includes .html: the intro cards are static pages in public/)
+    if (ext(path)) {
       const res = await fetch(RAW + url.pathname, { cf: { cacheEverything: true, cacheTtl: 86400 } });
       if (res.ok) {
         const headers = new Headers({
