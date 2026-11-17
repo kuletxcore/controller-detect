@@ -35,7 +35,7 @@ Infinix's official product pages (Philippines):
 
 Infinix partnered with Blood Strike for the GT NX launch:
 
-- It's the main game in the controller's **Native mode**, where the game reads the controller directly instead of going through XArena's touch-mapping mode. Mapping mode is for games without controller support, such as Honor of Kings.
+- Infinix lists it as a **Native mode** game: it has its own controller support, so it reads the GT NX as an ordinary Xbox controller. Mapping mode is for games without controller support, such as Honor of Kings.
 - TechNave says only Blood Strike and PUBG support the touchpad.
 - Infinix is also the official smartphone partner of the Blood Strike Assault tournament in the Philippines.
 
@@ -50,8 +50,8 @@ Infinix partnered with Blood Strike for the GT NX launch:
 
 **Modes** (switched in Infinix's XArena app):
 
-- **Native mode:** full support in partner games, including Blood Strike, Asphalt Legends and Asphalt 8.
-- **Combined mode:** one controller.
+- **Native mode** (the default): both halves together act as one standard Xbox controller (the ids say Microsoft, 045e:0b13). Any game or website with Xbox controller support works this way. Infinix lists Blood Strike, Asphalt Legends and Asphalt 8.
+- **Mapping mode:** XArena turns buttons into screen taps, for games with no controller support.
 - **Split mode:** each half becomes its own controller, held sideways like a Joy-Con, for two-player games. This is the mode this repo maps.
 
 **Price at launch:**
