@@ -31,6 +31,14 @@ Infinix's official product pages (Philippines):
 - [GT NX Controller](https://wap.ph.infinixmobility.com/specs/xpower-10-pro). The URL says "xpower-10-pro", but the page is the controller's.
 - [GT NX Controller Blood Strike](https://wap.ph.infinixmobility.com/GT-NX-Controller-Blood-Strike), a separate edition. The unit tested here doesn't carry the Blood Strike branding, but it still has native support for *Blood Strike*, NetEase's free-to-play battle royale shooter.
 
+**Blood Strike.** *Blood Strike* is NetEase Games' free-to-play shooter for phones (and PC since 2025). It's often called a Call of Duty: Warzone clone. Its modes include a 100-player Battle Royale, Squad Fight and Hot Zone, it has eight characters with their own skills, and it supports controllers natively.
+
+Infinix partnered with Blood Strike for the GT NX launch:
+
+- It's the main game in the controller's **Native mode**, where the game reads the controller directly instead of going through XArena's touch-mapping mode. Mapping mode is for games without controller support, such as Honor of Kings.
+- TechNave says only Blood Strike and PUBG support the touchpad.
+- Infinix is also the official smartphone partner of the Blood Strike Assault tournament in the Philippines.
+
 **Hardware.** These details come from press coverage, not an official spec sheet:
 
 - Left half: a Hall-effect stick and a D-pad.
@@ -51,4 +59,4 @@ Infinix's official product pages (Philippines):
 - Philippines: PHP 2,399 for the standard edition, PHP 2,499 for the Blood Strike Edition.
 - Malaysia: RRP RM399, with a promo price of RM299.
 
-Sources: [GizGuide review](https://www.gizguide.com/2026/10/infinix-gt-nx-controller-station-review.html), [TechNave review](https://technave.com/gadget/Infinix-GT-NX-Controller-and-GT-NX-Station-Review-A-New-Way-to-Play-Mobile-Games-47664.html), [FoneArena](https://www.fonearena.com/blog/493394/infinix-gt-nx-controller-gt-nx-station-features.html/amp), [Lowyat](https://www.lowyat.net/2026/405406/infinix-gt-nx-series-malaysia/), [ProPakistani](https://propakistani.pk/2026/09/26/infinix-launches-gaming-controller-with-mouse-like-accuracy-for-fps-gaming/), [Saiganak (weight)](https://saiganak.com/product/infinix-gt-nx-controller-gt-50-pro-gt-nt-station/).
+Sources: [GizGuide review](https://www.gizguide.com/2026/10/infinix-gt-nx-controller-station-review.html), [TechNave review](https://technave.com/gadget/Infinix-GT-NX-Controller-and-GT-NX-Station-Review-A-New-Way-to-Play-Mobile-Games-47664.html), [FoneArena](https://www.fonearena.com/blog/493394/infinix-gt-nx-controller-gt-nx-station-features.html/amp), [Lowyat](https://www.lowyat.net/2026/405406/infinix-gt-nx-series-malaysia/), [ProPakistani](https://propakistani.pk/2026/09/26/infinix-launches-gaming-controller-with-mouse-like-accuracy-for-fps-gaming/), [Saiganak (weight)](https://saiganak.com/product/infinix-gt-nx-controller-gt-50-pro-gt-nt-station/), [unbox.ph (native vs mapping mode)](https://unbox.ph/gadget/infinix-gt-nx-controller-station-feature/), [REVU (Blood Strike Assault partner)](https://www.revu.com.ph/?p=58066), [Blood Strike on the App Store](https://apps.apple.com/us/app/id1637059453), [RetroHandhelds on Blood Strike](https://retrohandhelds.gg/blood-strike-is-a-shameless-cod-ripoff-im-fine-with-that/).
